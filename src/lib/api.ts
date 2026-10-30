@@ -1,6 +1,8 @@
 import { Product, Order, Coupon, StoreSettings, Review, OrderStatus } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = 
+  import.meta.env.VITE_API_URL || 
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '/api' : 'http://localhost:5000/api');
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${url}`, {

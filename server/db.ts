@@ -13,8 +13,8 @@ const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, 'data', 'db.json');
 
 // Supabase Connection if available
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = (supabaseUrl && supabaseKey && !supabaseUrl.includes('your-supabase-url'))
   ? createClient(supabaseUrl, supabaseKey)
