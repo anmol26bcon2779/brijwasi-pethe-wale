@@ -159,6 +159,91 @@ function formatOrder(row: any, items: any[] = []): Order {
 // Async Database Interface
 export const db = {
   // ==========================================
+  // SEED INITIAL DATA (Auto-populates empty Supabase)
+  // ==========================================
+  seedInitialData: async (): Promise<void> => {
+    if (!supabase) return;
+    try {
+      console.log('[Supabase] Auto-seeding initial store data to Supabase...');
+
+      // 1. Seed store settings
+      await supabase.from('store_settings').upsert({
+        id: 1,
+        store_name: INITIAL_SETTINGS.storeName,
+        tagline: INITIAL_SETTINGS.tagline,
+        announcement_bar: INITIAL_SETTINGS.announcementBar,
+        phone: INITIAL_SETTINGS.phone,
+        whatsapp: INITIAL_SETTINGS.whatsapp,
+        email: INITIAL_SETTINGS.email,
+        address: INITIAL_SETTINGS.address,
+        city: INITIAL_SETTINGS.city,
+        state: INITIAL_SETTINGS.state,
+        pincode: INITIAL_SETTINGS.pincode,
+        standard_shipping_fee: INITIAL_SETTINGS.standardShippingFee,
+        free_shipping_threshold: INITIAL_SETTINGS.freeShippingThreshold,
+        is_cod_enabled: INITIAL_SETTINGS.isCodEnabled,
+        cod_fee: INITIAL_SETTINGS.codFee
+      }, { onConflict: 'id' });
+
+      // 2. Seed initial coupons
+      for (const coupon of INITIAL_COUPONS) {
+        await supabase.from('coupons').upsert({
+          code: coupon.code,
+          description: coupon.description,
+          discount_type: coupon.discountType,
+          discount_value: coupon.discountValue,
+          min_order_amount: coupon.minOrderAmount,
+          max_discount: coupon.maxDiscount || null,
+          is_active: coupon.isActive
+        }, { onConflict: 'code' });
+      }
+
+      // 3. Seed initial products & variants
+      for (const prod of INITIAL_PRODUCTS) {
+        await supabase.from('products').upsert({
+          id: prod.id,
+          slug: prod.slug,
+          name: prod.name,
+          hindi_name: prod.hindiName || null,
+          category: prod.category,
+          sub_category: prod.subCategory || null,
+          short_description: prod.shortDescription,
+          description: prod.description,
+          ingredients: prod.ingredients,
+          shelf_life: prod.shelfLife,
+          storage_instructions: prod.storageInstructions,
+          allergen_info: prod.allergenInfo || null,
+          is_vegetarian: prod.isVegetarian,
+          is_bestseller: prod.isBestseller || false,
+          is_featured: prod.isFeatured || false,
+          rating: prod.rating,
+          review_count: prod.reviewCount,
+          images: prod.images,
+          nutritional_info: prod.nutritionalInfo || {}
+        }, { onConflict: 'id' });
+
+        if (prod.variants && prod.variants.length > 0) {
+          const variantsToInsert = prod.variants.map(v => ({
+            id: v.id,
+            product_id: prod.id,
+            weight: v.weight,
+            weight_in_grams: v.weightInGrams,
+            price: v.price,
+            mrp: v.mrp,
+            stock: v.stock,
+            sku: v.sku || null,
+            is_default: Boolean(v.isDefault)
+          }));
+          await supabase.from('product_variants').upsert(variantsToInsert, { onConflict: 'id' });
+        }
+      }
+      console.log('[Supabase] Initial delicacies and settings successfully seeded to Supabase!');
+    } catch (err) {
+      console.error('[Supabase] Error during initial data seed:', err);
+    }
+  },
+
+  // ==========================================
   // PRODUCTS
   // ==========================================
   getProducts: async (): Promise<Product[]> => {
@@ -171,6 +256,18 @@ export const db = {
 
         if (!prodErr && prods && prods.length > 0) {
           return prods.map(p => formatProduct(p, p.product_variants));
+        }
+
+        // If table exists but has 0 rows, auto-seed and return
+        if (!prodErr && prods && prods.length === 0) {
+          await db.seedInitialData();
+          const { data: seededProds } = await supabase
+            .from('products')
+            .select('*, product_variants(*)')
+            .order('created_at', { ascending: false });
+          if (seededProds && seededProds.length > 0) {
+            return seededProds.map(p => formatProduct(p, p.product_variants));
+          }
         }
       } catch (err) {
         console.error('[Supabase] Failed to fetch products, falling back to local data:', err);
@@ -205,7 +302,7 @@ export const db = {
   addProduct: async (product: Product): Promise<Product> => {
     if (supabase) {
       try {
-        const { data: insertedProduct, error: prodErr } = await supabase
+        const { error: prodErr } = await supabase
           .from('products')
           .insert({
             id: product.id,
@@ -227,9 +324,7 @@ export const db = {
             review_count: product.reviewCount,
             images: product.images,
             nutritional_info: product.nutritionalInfo || {}
-          })
-          .select()
-          .single();
+          });
 
         if (prodErr) throw prodErr;
 
@@ -249,7 +344,6 @@ export const db = {
           await supabase.from('product_variants').insert(variantsToInsert);
         }
 
-        // Cache update
         localDbState.products.unshift(product);
         persistLocalDatabase();
         return product;
@@ -287,7 +381,6 @@ export const db = {
           })
           .eq('id', product.id);
 
-        // Update variants
         if (product.variants) {
           for (const v of product.variants) {
             await supabase
@@ -385,12 +478,39 @@ export const db = {
   addOrder: async (order: Order): Promise<Order> => {
     if (supabase) {
       try {
+        // Find or create customer
+        let customerId: string | null = null;
+        if (order.customer.phone) {
+          const { data: existingCust } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('phone', order.customer.phone)
+            .maybeSingle();
+
+          if (existingCust) {
+            customerId = existingCust.id;
+          } else {
+            const { data: newCust } = await supabase
+              .from('customers')
+              .insert({
+                full_name: order.customer.fullName,
+                phone: order.customer.phone,
+                email: order.customer.email || null,
+                role: 'customer'
+              })
+              .select('id')
+              .maybeSingle();
+            if (newCust) customerId = newCust.id;
+          }
+        }
+
         // 1. Insert order record
         const { error: orderErr } = await supabase
           .from('orders')
           .insert({
             id: order.id,
             order_number: order.orderNumber,
+            customer_id: customerId,
             customer_name: order.customer.fullName,
             customer_email: order.customer.email,
             customer_phone: order.customer.phone,
@@ -517,7 +637,6 @@ export const db = {
       }
     }
 
-    // Local state sync
     existing.status = status;
     if (trackingNumber) existing.trackingNumber = trackingNumber;
     if (courierPartner) existing.courierPartner = courierPartner;

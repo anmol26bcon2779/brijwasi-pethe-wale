@@ -12,6 +12,7 @@ import reviewsRouter from './routes/reviews.js';
 import settingsRouter from './routes/settings.js';
 import paymentRouter from './routes/payment.js';
 import authRouter from './routes/auth.js';
+import { supabase } from './db.js';
 
 dotenv.config();
 
@@ -52,10 +53,54 @@ app.use('/api/auth', authRouter);
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'online',
+    database: supabase ? 'supabase-connected' : 'local-fallback',
     store: 'Brijwasi Pethe Wale Backend API',
     location: 'Agra, Uttar Pradesh',
     timestamp: new Date().toISOString()
   });
+});
+
+// Live Supabase Status Verification (Never exposes secrets)
+app.get('/api/supabase-status', async (_req, res) => {
+  try {
+    const isConfigured = Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY));
+    if (!supabase) {
+      return res.json({
+        connected: false,
+        configured: isConfigured,
+        message: 'Supabase client is operating in fallback mode. Ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in Vercel.',
+        variablesDetected: {
+          SUPABASE_URL: Boolean(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL),
+          SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)
+        }
+      });
+    }
+
+    const [prodCheck, orderCheck, couponCheck, settingsCheck] = await Promise.allSettled([
+      supabase.from('products').select('id', { count: 'exact', head: true }),
+      supabase.from('orders').select('id', { count: 'exact', head: true }),
+      supabase.from('coupons').select('id', { count: 'exact', head: true }),
+      supabase.from('store_settings').select('id', { count: 'exact', head: true })
+    ]);
+
+    res.json({
+      connected: true,
+      configured: true,
+      database: 'Supabase PostgreSQL (Live)',
+      authMode: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'service_role (Admin Backend)' : 'anon (Public)',
+      tables: {
+        products: prodCheck.status === 'fulfilled' ? prodCheck.value.count : 'Error',
+        orders: orderCheck.status === 'fulfilled' ? orderCheck.value.count : 'Error',
+        coupons: couponCheck.status === 'fulfilled' ? couponCheck.value.count : 'Error',
+        store_settings: settingsCheck.status === 'fulfilled' ? settingsCheck.value.count : 'Error'
+      },
+      status: 'operational',
+      timestamp: new Date().toISOString()
+    });
+  } catch (err: any) {
+    res.status(500).json({ connected: false, error: err.message });
+  }
 });
 
 // Serve frontend build if dist exists in production
