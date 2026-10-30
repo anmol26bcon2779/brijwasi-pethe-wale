@@ -95,7 +95,8 @@ router.post('/', (req: Request, res: Response) => {
 // PATCH /api/coupons/:code/toggle
 router.patch('/:code/toggle', (req: Request, res: Response) => {
   try {
-    const updated = db.toggleCouponStatus(req.params.code);
+    const code = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
+    const updated = db.toggleCouponStatus(code);
     if (!updated) {
       return res.status(404).json({ success: false, message: 'Coupon not found' });
     }
@@ -108,8 +109,9 @@ router.patch('/:code/toggle', (req: Request, res: Response) => {
 // DELETE /api/coupons/:code
 router.delete('/:code', (req: Request, res: Response) => {
   try {
-    db.deleteCoupon(req.params.code);
-    res.json({ success: true, message: `Coupon ${req.params.code} deleted` });
+    const code = Array.isArray(req.params.code) ? req.params.code[0] : req.params.code;
+    db.deleteCoupon(code);
+    res.json({ success: true, message: `Coupon ${code} deleted` });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

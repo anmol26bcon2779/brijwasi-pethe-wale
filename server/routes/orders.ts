@@ -21,7 +21,8 @@ router.get('/', (req: Request, res: Response) => {
 // GET /api/orders/:identifier (Track order or invoice)
 router.get('/:identifier', (req: Request, res: Response) => {
   try {
-    const order = db.getOrderByIdOrNumber(req.params.identifier);
+    const identifier = Array.isArray(req.params.identifier) ? req.params.identifier[0] : req.params.identifier;
+    const order = db.getOrderByIdOrNumber(identifier);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
@@ -140,8 +141,9 @@ router.patch('/:identifier/status', (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Invalid order status' });
     }
 
+    const identifier = Array.isArray(req.params.identifier) ? req.params.identifier[0] : req.params.identifier;
     const updated = db.updateOrderStatus(
-      req.params.identifier,
+      identifier,
       status,
       trackingNumber,
       courierPartner

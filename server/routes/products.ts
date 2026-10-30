@@ -45,7 +45,8 @@ router.get('/', (req: Request, res: Response) => {
 // GET /api/products/:slugOrId
 router.get('/:slugOrId', (req: Request, res: Response) => {
   try {
-    const product = db.getProductBySlugOrId(req.params.slugOrId);
+    const identifier = Array.isArray(req.params.slugOrId) ? req.params.slugOrId[0] : req.params.slugOrId;
+    const product = db.getProductBySlugOrId(identifier);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Delicacy not found' });
     }
@@ -94,7 +95,8 @@ router.post('/', (req: Request, res: Response) => {
 // PUT /api/products/:id (Admin)
 router.put('/:id', (req: Request, res: Response) => {
   try {
-    const existing = db.getProductBySlugOrId(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const existing = db.getProductBySlugOrId(id);
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
@@ -114,7 +116,8 @@ router.put('/:id', (req: Request, res: Response) => {
 // DELETE /api/products/:id (Admin)
 router.delete('/:id', (req: Request, res: Response) => {
   try {
-    const existing = db.getProductBySlugOrId(req.params.id);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const existing = db.getProductBySlugOrId(id);
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
