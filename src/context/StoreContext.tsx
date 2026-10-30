@@ -13,6 +13,7 @@ import {
   saveStoredReviews,
   syncOrderToSupabase
 } from '../lib/storage';
+import { api } from '../lib/api';
 
 interface StoreContextType {
   products: Product[];
@@ -60,13 +61,58 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Initialize from storage on mount
+  // Initialize from storage & sync with backend API if online
   useEffect(() => {
-    setProducts(getStoredProducts());
-    setOrders(getStoredOrders());
-    setCoupons(getStoredCoupons());
-    setSettings(getStoredSettings());
-    setReviews(getStoredReviews());
+    // 1. Initial immediate local cache
+    const initialProducts = getStoredProducts();
+    const initialOrders = getStoredOrders();
+    const initialCoupons = getStoredCoupons();
+    const initialSettings = getStoredSettings();
+    const initialReviews = getStoredReviews();
+
+    setProducts(initialProducts);
+    setOrders(initialOrders);
+    setCoupons(initialCoupons);
+    setSettings(initialSettings);
+    setReviews(initialReviews);
+
+    // 2. Async backend sync
+    const syncWithBackend = async () => {
+      try {
+        const [prodRes, ordRes, coupRes, settRes, revRes] = await Promise.allSettled([
+          api.getProducts(),
+          api.getOrders(),
+          api.getCoupons(),
+          api.getSettings(),
+          api.getReviews()
+        ]);
+
+        if (prodRes.status === 'fulfilled' && prodRes.value.data?.length) {
+          setProducts(prodRes.value.data);
+          saveStoredProducts(prodRes.value.data);
+        }
+        if (ordRes.status === 'fulfilled' && ordRes.value.data?.length) {
+          setOrders(ordRes.value.data);
+          saveStoredOrders(ordRes.value.data);
+        }
+        if (coupRes.status === 'fulfilled' && coupRes.value.data?.length) {
+          setCoupons(coupRes.value.data);
+          saveStoredCoupons(coupRes.value.data);
+        }
+        if (settRes.status === 'fulfilled' && settRes.value.data) {
+          setSettings(settRes.value.data);
+          saveStoredSettings(settRes.value.data);
+        }
+        if (revRes.status === 'fulfilled' && revRes.value.data?.length) {
+          setReviews(revRes.value.data);
+          saveStoredReviews(revRes.value.data);
+        }
+      } catch {
+        // Safe fallback to local cache
+      }
+    };
+
+    syncWithBackend();
   }, []);
 
   // Products
@@ -97,6 +143,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const updated = [order, ...orders];
     setOrders(updated);
     saveStoredOrders(updated);
+    
+    // Sync to backend API
+    try {
+      await api.createOrder(order);
+    } catch (e) {
+      console.warn('API order sync note:', e);
+    }
+
     await syncOrderToSupabase(order);
   };
 
@@ -128,6 +182,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     });
     setOrders(updated);
     saveStoredOrders(updated);
+
+    // Sync to backend API
+    try {
+      api.updateOrderStatus(orderId, status, trackingNumber, courierPartner);
+    } catch (e) {
+      console.warn('API status update note:', e);
+    }
   };
 
   const getOrderByIdOrNumber = (identifier: string) => {
