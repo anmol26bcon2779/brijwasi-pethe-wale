@@ -1,17 +1,18 @@
 -- ==============================================================================
--- Brijwasi Pethe Wale — 14 Authentic Products & Variants Migration SQL
--- Idempotent: Safe to run multiple times without creating duplicates
+-- Brijwasi Pethe Wale — 14 Authentic Delicacies & 35 Variants SQL Migration
+-- Run this directly in Supabase Dashboard -> SQL Editor -> Run
+-- Non-Destructive & Idempotent: Safe to run multiple times without duplicates
 -- ==============================================================================
 
--- 1. INSERT / UPSERT PRODUCTS
-
+-- 1. INSERT ALL 14 PRODUCTS
 INSERT INTO public.products (
     id, slug, name, hindi_name, category, sub_category,
     short_description, description, ingredients, shelf_life,
     storage_instructions, allergen_info, is_vegetarian,
     is_bestseller, is_featured, rating, review_count, images,
     nutritional_info, created_at, updated_at
-) VALUES (
+) VALUES
+(
     'prod-angoori-petha',
     'angoori-petha',
     'Royal Angoori Petha',
@@ -33,33 +34,8 @@ INSERT INTO public.products (
     '{"calories":"320 kcal per 100g","carbohydrates":"78g","protein":"0.8g","fat":"0.2g"}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-kesar-angoori-petha',
     'kesar-angoori-petha',
     'Shahi Kesar Angoori Petha',
@@ -81,33 +57,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-paan-petha',
     'paan-petha',
     'Banarasi Gulkand Paan Petha',
@@ -129,33 +80,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-chocolate-petha',
     'chocolate-petha',
     'Belgian Cocoa Chocolate Petha',
@@ -177,33 +103,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-coconut-petha',
     'coconut-petha',
     'Nariyal (Coconut) Petha',
@@ -225,33 +126,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-mango-petha',
     'mango-petha',
     'Alphonso Mango Petha',
@@ -273,33 +149,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-gulab-laddu-petha',
     'gulab-laddu-petha',
     'Gulab Laddu Petha',
@@ -321,33 +172,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-shalimar-petha',
     'shalimar-petha',
     'Royal Shalimar Petha',
@@ -369,33 +195,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-rasbhari-petha',
     'rasbhari-petha',
     'Rasbhari Kesar Petha',
@@ -417,33 +218,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-agra-dalmoth',
     'agra-dalmoth-namkeen',
     'Authentic Agra Dalmoth',
@@ -465,33 +241,8 @@ INSERT INTO public.products (
     '{"calories":"495 kcal per 100g","carbohydrates":"42g","protein":"14.5g","fat":"28g"}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-shahi-mixture',
     'shahi-mixture-namkeen',
     'Shahi Royal Dry Fruit Mixture',
@@ -513,33 +264,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-heeng-sev',
     'mathura-agra-heeng-sev',
     'Mathura-Agra Heeng Sev',
@@ -561,33 +287,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-navratan-mixture',
     'navratan-mixture',
     'Navratan Royal 9-Gem Mixture',
@@ -609,33 +310,8 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    hindi_name = EXCLUDED.hindi_name,
-    category = EXCLUDED.category,
-    sub_category = EXCLUDED.sub_category,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    ingredients = EXCLUDED.ingredients,
-    shelf_life = EXCLUDED.shelf_life,
-    storage_instructions = EXCLUDED.storage_instructions,
-    allergen_info = EXCLUDED.allergen_info,
-    is_vegetarian = EXCLUDED.is_vegetarian,
-    is_bestseller = EXCLUDED.is_bestseller,
-    is_featured = EXCLUDED.is_featured,
-    rating = EXCLUDED.rating,
-    review_count = EXCLUDED.review_count,
-    images = EXCLUDED.images,
-    nutritional_info = EXCLUDED.nutritional_info,
-    updated_at = NOW();
-
-INSERT INTO public.products (
-    id, slug, name, hindi_name, category, sub_category,
-    short_description, description, ingredients, shelf_life,
-    storage_instructions, allergen_info, is_vegetarian,
-    is_bestseller, is_featured, rating, review_count, images,
-    nutritional_info, created_at, updated_at
-) VALUES (
+),
+(
     'prod-taj-heritage-box',
     'taj-heritage-royal-gift-box',
     'Taj Heritage Royal Gift Box (Assorted)',
@@ -657,7 +333,9 @@ INSERT INTO public.products (
     '{}'::jsonb,
     NOW(),
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
+)
+ON CONFLICT (id) DO UPDATE SET
+    slug = EXCLUDED.slug,
     name = EXCLUDED.name,
     hindi_name = EXCLUDED.hindi_name,
     category = EXCLUDED.category,
@@ -677,11 +355,11 @@ INSERT INTO public.products (
     nutritional_info = EXCLUDED.nutritional_info,
     updated_at = NOW();
 
--- 2. INSERT / UPSERT PRODUCT VARIANTS
-
+-- 2. INSERT ALL 35 PRODUCT VARIANTS (Pack weights, prices, MRP & stocks)
 INSERT INTO public.product_variants (
     id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+) VALUES
+(
     'var-ang-500g',
     'prod-angoori-petha',
     '500g',
@@ -692,19 +370,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-ang-1kg',
     'prod-angoori-petha',
     '1kg',
@@ -715,19 +382,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-ang-250g',
     'prod-angoori-petha',
     '250g',
@@ -738,19 +394,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-ksr-500g',
     'prod-kesar-angoori-petha',
     '500g',
@@ -761,19 +406,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-ksr-1kg',
     'prod-kesar-angoori-petha',
     '1kg',
@@ -784,19 +418,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-ksr-250g',
     'prod-kesar-angoori-petha',
     '250g',
@@ -807,19 +430,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-pan-500g',
     'prod-paan-petha',
     '500g',
@@ -830,19 +442,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-pan-1kg',
     'prod-paan-petha',
     '1kg',
@@ -853,19 +454,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-pan-250g',
     'prod-paan-petha',
     '250g',
@@ -876,19 +466,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-choc-500g',
     'prod-chocolate-petha',
     '500g',
@@ -899,19 +478,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-choc-1kg',
     'prod-chocolate-petha',
     '1kg',
@@ -922,19 +490,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-choc-250g',
     'prod-chocolate-petha',
     '250g',
@@ -945,19 +502,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-coc-500g',
     'prod-coconut-petha',
     '500g',
@@ -968,19 +514,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-coc-1kg',
     'prod-coconut-petha',
     '1kg',
@@ -991,19 +526,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-coc-250g',
     'prod-coconut-petha',
     '250g',
@@ -1014,19 +538,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-mng-500g',
     'prod-mango-petha',
     '500g',
@@ -1037,19 +550,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-mng-1kg',
     'prod-mango-petha',
     '1kg',
@@ -1060,19 +562,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-glb-500g',
     'prod-gulab-laddu-petha',
     '500g',
@@ -1083,19 +574,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-glb-1kg',
     'prod-gulab-laddu-petha',
     '1kg',
@@ -1106,19 +586,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-shl-500g',
     'prod-shalimar-petha',
     '500g',
@@ -1129,19 +598,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-shl-1kg',
     'prod-shalimar-petha',
     '1kg',
@@ -1152,19 +610,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-rsb-500g',
     'prod-rasbhari-petha',
     '500g',
@@ -1175,19 +622,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-rsb-1kg',
     'prod-rasbhari-petha',
     '1kg',
@@ -1198,19 +634,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-dlm-500g',
     'prod-agra-dalmoth',
     '500g',
@@ -1221,19 +646,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-dlm-1kg',
     'prod-agra-dalmoth',
     '1kg',
@@ -1244,19 +658,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-dlm-250g',
     'prod-agra-dalmoth',
     '250g',
@@ -1267,19 +670,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-shh-500g',
     'prod-shahi-mixture',
     '500g',
@@ -1290,19 +682,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-shh-1kg',
     'prod-shahi-mixture',
     '1kg',
@@ -1313,19 +694,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-shh-250g',
     'prod-shahi-mixture',
     '250g',
@@ -1336,19 +706,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-hng-500g',
     'prod-heeng-sev',
     '500g',
@@ -1359,19 +718,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-hng-1kg',
     'prod-heeng-sev',
     '1kg',
@@ -1382,19 +730,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-hng-250g',
     'prod-heeng-sev',
     '250g',
@@ -1405,19 +742,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-nav-500g',
     'prod-navratan-mixture',
     '500g',
@@ -1428,19 +754,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-nav-1kg',
     'prod-navratan-mixture',
     '1kg',
@@ -1451,19 +766,8 @@ INSERT INTO public.product_variants (
     NULL,
     false,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
-    product_id = EXCLUDED.product_id,
-    weight = EXCLUDED.weight,
-    weight_in_grams = EXCLUDED.weight_in_grams,
-    price = EXCLUDED.price,
-    mrp = EXCLUDED.mrp,
-    stock = EXCLUDED.stock,
-    sku = EXCLUDED.sku,
-    is_default = EXCLUDED.is_default;
-
-INSERT INTO public.product_variants (
-    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
-) VALUES (
+),
+(
     'var-taj-1250g',
     'prod-taj-heritage-box',
     '1.25 kg Box',
@@ -1474,7 +778,8 @@ INSERT INTO public.product_variants (
     NULL,
     true,
     NOW()
-) ON CONFLICT (id) DO UPDATE SET
+)
+ON CONFLICT (id) DO UPDATE SET
     product_id = EXCLUDED.product_id,
     weight = EXCLUDED.weight,
     weight_in_grams = EXCLUDED.weight_in_grams,
