@@ -1,0 +1,490 @@
+import { Product, Coupon, StoreSettings, Review } from '../types';
+
+export const INITIAL_SETTINGS: StoreSettings = {
+  storeName: 'Brijwasi Pethe Wale',
+  tagline: 'Experience the Royal Sweetness of Agra',
+  announcementBar: '✨ Authentic Taste of Agra | Traditional Sweets Delivered Fresh Across India | Free Shipping Above ₹799',
+  phone: '+91 98970 23456',
+  whatsapp: '+91 98970 23456',
+  email: 'care@brijwasipethewale.com',
+  address: 'Shop No. 14, Eastern Gate Market, Near Taj Mahal, Fatehabad Road',
+  city: 'Agra',
+  state: 'Uttar Pradesh',
+  pincode: '282001',
+  standardShippingFee: 80,
+  freeShippingThreshold: 799,
+  isCodEnabled: true,
+  codFee: 40,
+  razorpayKeyId: 'rzp_test_BrijwasiDemoKey123',
+};
+
+export const INITIAL_PRODUCTS: Product[] = [
+  {
+    id: 'prod-angoori-petha',
+    slug: 'angoori-petha',
+    name: 'Royal Angoori Petha',
+    hindiName: 'अंगूरी पेठा',
+    category: 'petha',
+    subCategory: 'syrup',
+    shortDescription: 'Grape-sized translucent succulent ash gourd pearls gently simmered in fragrant saffron-infused sugar elixir.',
+    description: 'Our signature delicacy from the heart of Agra. Angoori Petha is crafted from premium winter melon (ash gourd), delicately peeled and carved into grape-sized bite-sized globes. Each piece is simmered slowly in a clarified sugar syrup perfumed with pure kewra water and green cardamom, creating an exquisite melt-in-mouth burst of authentic royal sweetness.',
+    ingredients: ['Winter Melon (White Ash Gourd)', 'Sugar', 'Purified Water', 'Kewra Water', 'Green Cardamom'],
+    shelfLife: '12-15 Days (Keep refrigerated for optimal freshness)',
+    storageInstructions: 'Store in an airtight container under refrigeration once opened. Consume chilled for best taste.',
+    allergenInfo: 'Made in a facility that also processes tree nuts and milk solids.',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 4.9,
+    reviewCount: 342,
+    images: [
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-ang-500g', weight: '500g', weightInGrams: 500, price: 190, mrp: 220, stock: 45, isDefault: true },
+      { id: 'var-ang-1kg', weight: '1kg', weightInGrams: 1000, price: 360, mrp: 420, stock: 30 },
+      { id: 'var-ang-250g', weight: '250g', weightInGrams: 250, price: 110, mrp: 130, stock: 50 }
+    ],
+    nutritionalInfo: {
+      calories: '320 kcal per 100g',
+      carbohydrates: '78g',
+      protein: '0.8g',
+      fat: '0.2g'
+    }
+  },
+  {
+    id: 'prod-kesar-angoori-petha',
+    slug: 'kesar-angoori-petha',
+    name: 'Shahi Kesar Angoori Petha',
+    hindiName: 'शाही केसर अंगूरी पेठा',
+    category: 'petha',
+    subCategory: 'premium',
+    shortDescription: 'Golden translucent petha pearls soaked in authentic Kashmiri saffron strands and silver vark.',
+    description: 'A royal creation steeped in Mughal heritage. Prime hand-carved ash gourd globes are enriched with original Mogra saffron from the valleys of Kashmir. Every bite offers a luminous golden color, exquisite floral saffron aroma, and deeply satisfying natural sweet juice.',
+    ingredients: ['Winter Melon (Ash Gourd)', 'Sugar', 'Pure Kashmiri Saffron (Kesar)', 'Cardamom Extract', 'Rose Water'],
+    shelfLife: '14 Days (Refrigerate after opening)',
+    storageInstructions: 'Keep in cool refrigeration. Do not expose to direct sunlight.',
+    allergenInfo: '100% Nut Free and Dairy Free.',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 5.0,
+    reviewCount: 428,
+    images: [
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+    ],
+    variants: [
+      { id: 'var-ksr-500g', weight: '500g', weightInGrams: 500, price: 240, mrp: 280, stock: 40, isDefault: true },
+      { id: 'var-ksr-1kg', weight: '1kg', weightInGrams: 1000, price: 460, mrp: 540, stock: 25 },
+      { id: 'var-ksr-250g', weight: '250g', weightInGrams: 250, price: 135, mrp: 160, stock: 60 }
+    ]
+  },
+  {
+    id: 'prod-paan-petha',
+    slug: 'paan-petha',
+    name: 'Banarasi Gulkand Paan Petha',
+    hindiName: 'शाही पान पेठा',
+    category: 'petha',
+    subCategory: 'flavoured',
+    shortDescription: 'Delicate emerald petha parcels folded like royal betel paan, stuffed with aromatic gulkand, fennel & dry fruits.',
+    description: 'An artistic culinary tribute marrying the iconic Agra petha with the imperial after-dinner tradition of Banarasi Paan. Thin layers of tender green petha are hand-folded into royal triangles, encapsulating a fragrant filling of damask rose gulkand, crushed almonds, pistachios, saunf, and aromatic spices.',
+    ingredients: ['Ash Gourd', 'Sugar', 'Natural Betel Extract', 'Organic Damask Rose Gulkand', 'Almonds', 'Pistachios', 'Fennel Seeds', 'Cardamom'],
+    shelfLife: '10-12 Days',
+    storageInstructions: 'Store in airtight box inside refrigerator. Best served chilled.',
+    allergenInfo: 'Contains Tree Nuts (Almonds, Pistachios).',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 4.8,
+    reviewCount: 290,
+    images: [
+      'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-pan-500g', weight: '500g', weightInGrams: 500, price: 230, mrp: 270, stock: 35, isDefault: true },
+      { id: 'var-pan-1kg', weight: '1kg', weightInGrams: 1000, price: 440, mrp: 520, stock: 20 },
+      { id: 'var-pan-250g', weight: '250g', weightInGrams: 250, price: 130, mrp: 150, stock: 45 }
+    ]
+  },
+  {
+    id: 'prod-chocolate-petha',
+    slug: 'chocolate-petha',
+    name: 'Belgian Cocoa Chocolate Petha',
+    hindiName: 'चॉकलेट पेठा',
+    category: 'petha',
+    subCategory: 'flavoured',
+    shortDescription: 'Modern indulgence meets heritage craft: Juicy Agra petha enrobed in a velvety decadent cocoa glaze.',
+    description: 'A revolutionary fusion beloved by children and youth alike! Crisp yet juicy Agra petha cubes are infused with rich, velvety dark Dutch cocoa and milk chocolate notes. The delicate crunch of candied ash gourd blends effortlessly with rich chocolate bliss.',
+    ingredients: ['Ash Gourd', 'Sugar', 'Pure Cocoa Powder', 'Milk Solids', 'Vanilla Extract', 'Kewra'],
+    shelfLife: '20 Days',
+    storageInstructions: 'Store in cool and dry place away from heat and moisture.',
+    allergenInfo: 'Contains Milk Solids.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: true,
+    rating: 4.7,
+    reviewCount: 185,
+    images: [
+      'https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-choc-500g', weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 30, isDefault: true },
+      { id: 'var-choc-1kg', weight: '1kg', weightInGrams: 1000, price: 420, mrp: 500, stock: 15 },
+      { id: 'var-choc-250g', weight: '250g', weightInGrams: 250, price: 125, mrp: 150, stock: 40 }
+    ]
+  },
+  {
+    id: 'prod-coconut-petha',
+    slug: 'coconut-petha',
+    name: 'Nariyal (Coconut) Petha',
+    hindiName: 'नारियल पेठा',
+    category: 'petha',
+    subCategory: 'flavoured',
+    shortDescription: 'Soft tender petha cubes rolled in freshly toasted aromatic Malabar coconut flakes.',
+    description: 'A heavenly tropical balance. We take soft, juicy, crystallized Agra petha and generously roll it in fine desiccated coconut toasted to gentle perfection. The fragrant texture of coconut complements the moist core wonderfully.',
+    ingredients: ['Ash Gourd', 'Sugar', 'Desiccated Coconut Flakes', 'Cardamom', 'Purified Water'],
+    shelfLife: '18 Days',
+    storageInstructions: 'Store in a dry airtight container.',
+    allergenInfo: 'Contains Coconut.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: false,
+    rating: 4.7,
+    reviewCount: 142,
+    images: [
+      'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-coc-500g', weight: '500g', weightInGrams: 500, price: 200, mrp: 240, stock: 28, isDefault: true },
+      { id: 'var-coc-1kg', weight: '1kg', weightInGrams: 1000, price: 380, mrp: 450, stock: 20 },
+      { id: 'var-coc-250g', weight: '250g', weightInGrams: 250, price: 115, mrp: 140, stock: 35 }
+    ]
+  },
+  {
+    id: 'prod-mango-petha',
+    slug: 'mango-petha',
+    name: 'Alphonso Mango Petha',
+    hindiName: 'अल्फांसो आम पेठा',
+    category: 'petha',
+    subCategory: 'flavoured',
+    shortDescription: 'Sun-ripened Ratnagiri Alphonso mango pulp infused with tender, juicy Agra petha squares.',
+    description: 'Bursting with tropical delight. Created by steeping natural Alphonso mango puree into freshly carved petha. Refreshing, vibrant orange hue and an intoxicating fruity fragrance that elevates traditional sweetness into sheer joy.',
+    ingredients: ['White Gourd', 'Sugar', 'Alphonso Mango Pulp', 'Citric Acid', 'Natural Mango Extract'],
+    shelfLife: '15 Days',
+    storageInstructions: 'Refrigerate once received. Keep sealed.',
+    allergenInfo: 'Free from synthetic chemicals.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: false,
+    rating: 4.8,
+    reviewCount: 167,
+    images: [
+      'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-mng-500g', weight: '500g', weightInGrams: 500, price: 210, mrp: 250, stock: 32, isDefault: true },
+      { id: 'var-mng-1kg', weight: '1kg', weightInGrams: 1000, price: 400, mrp: 480, stock: 18 }
+    ]
+  },
+  {
+    id: 'prod-gulab-laddu-petha',
+    slug: 'gulab-laddu-petha',
+    name: 'Gulab Laddu Petha',
+    hindiName: 'गुलाब लड्डू पेठा',
+    category: 'petha',
+    subCategory: 'premium',
+    shortDescription: 'Spherical rose-scented petha laddus infused with edible rose petals, pistachios & cardamom.',
+    description: 'Shaped like celebratory round laddus, this delicacy is hand-rolled from finely grated petha bound with fragrant Damascus rose water and encrusted with crushed Persian pistachios and wild rose petals.',
+    ingredients: ['Ash Gourd', 'Sugar', 'Pure Rose Petals', 'Rose Water', 'Pistachios', 'Elaichi'],
+    shelfLife: '15 Days',
+    storageInstructions: 'Store in cool and dry place in a tight lid box.',
+    allergenInfo: 'Contains Pistachios.',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 4.9,
+    reviewCount: 210,
+    images: [
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-glb-500g', weight: '500g', weightInGrams: 500, price: 230, mrp: 270, stock: 24, isDefault: true },
+      { id: 'var-glb-1kg', weight: '1kg', weightInGrams: 1000, price: 440, mrp: 520, stock: 16 }
+    ]
+  },
+  {
+    id: 'prod-shalimar-petha',
+    slug: 'shalimar-petha',
+    name: 'Royal Shalimar Petha',
+    hindiName: 'शालीमार पेठा',
+    category: 'petha',
+    subCategory: 'premium',
+    shortDescription: 'Multi-layered jewel sweet combining kesar, pista, and mawa stuffed inside tender petha ribbons.',
+    description: 'Inspired by the imperial gardens of the Mughal emperors. Shalimar petha brings together multi-layered craftsmanship: golden saffron outer layers wrapped lovingly around khoya, crushed almonds, and green cardamom.',
+    ingredients: ['Ash Gourd', 'Pure Khoya / Mawa', 'Sugar', 'Kashmiri Saffron', 'Pistachios', 'Almonds', 'Cardamom'],
+    shelfLife: '8-10 Days (Refrigerate promptly)',
+    storageInstructions: 'Must keep strictly refrigerated under 5°C.',
+    allergenInfo: 'Contains Dairy (Khoya/Milk) and Nuts (Almonds, Pistachios).',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 5.0,
+    reviewCount: 312,
+    images: [
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-shl-500g', weight: '500g', weightInGrams: 500, price: 260, mrp: 300, stock: 22, isDefault: true },
+      { id: 'var-shl-1kg', weight: '1kg', weightInGrams: 1000, price: 500, mrp: 580, stock: 12 }
+    ]
+  },
+  {
+    id: 'prod-rasbhari-petha',
+    slug: 'rasbhari-petha',
+    name: 'Rasbhari Kesar Petha',
+    hindiName: 'रसभरी केसर पेठा',
+    category: 'petha',
+    subCategory: 'syrup',
+    shortDescription: 'Extra juicy, spongy Agra petha bursting with thick saffron and rose scented syrup.',
+    description: 'The epitome of Agra street indulgence. Rasbhari petha translates to "overflowing with nectar." Every single cube holds immense fragrant saffron syrup that gushes upon first bite.',
+    ingredients: ['Winter Melon', 'Sugar', 'Saffron', 'Kewra Essence', 'Cardamom'],
+    shelfLife: '14 Days',
+    storageInstructions: 'Store in refrigerator container. Serve chilled.',
+    allergenInfo: '100% Nut Free and Vegan.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: false,
+    rating: 4.8,
+    reviewCount: 195,
+    images: [
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-rsb-500g', weight: '500g', weightInGrams: 500, price: 195, mrp: 230, stock: 35, isDefault: true },
+      { id: 'var-rsb-1kg', weight: '1kg', weightInGrams: 1000, price: 370, mrp: 440, stock: 25 }
+    ]
+  },
+
+  // NAMKEEN COLLECTION
+  {
+    id: 'prod-agra-dalmoth',
+    slug: 'agra-dalmoth-namkeen',
+    name: 'Authentic Agra Dalmoth',
+    hindiName: 'आगरा की प्रसिद्ध दालमोठ',
+    category: 'namkeen',
+    subCategory: 'traditional',
+    shortDescription: 'World-renowned spicy fried moth lentils, golden sev, cashews & musk melon seeds roasted in pure desi ghee.',
+    description: 'The legendary namkeen that Agra is famous for across the globe. Carefully selected whole brown moth beans (dew gram) are soaked, fried to crunchy perfection in pure ghee, and tossed with roasted cashews, musk melon seeds (magaz), crispy sev, and an ancestral blend of dry mango powder (amchur), black pepper, and clove spices.',
+    ingredients: ['Moth Dal (Dew Gram)', 'Gram Flour (Besan)', 'Pure Desi Ghee', 'Whole Cashews', 'Melon Seeds (Magaz)', 'Black Pepper', 'Amchur', 'Hing', 'Rock Salt'],
+    shelfLife: '90 Days',
+    storageInstructions: 'Store in a cool dry place in an airtight jar. Keep away from moisture.',
+    allergenInfo: 'Contains Cashews and Gram Flour (Besan).',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 4.9,
+    reviewCount: 512,
+    images: [
+      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-dlm-500g', weight: '500g', weightInGrams: 500, price: 240, mrp: 280, stock: 55, isDefault: true },
+      { id: 'var-dlm-1kg', weight: '1kg', weightInGrams: 1000, price: 460, mrp: 540, stock: 35 },
+      { id: 'var-dlm-250g', weight: '250g', weightInGrams: 250, price: 130, mrp: 150, stock: 70 }
+    ],
+    nutritionalInfo: {
+      calories: '495 kcal per 100g',
+      carbohydrates: '42g',
+      protein: '14.5g',
+      fat: '28g'
+    }
+  },
+  {
+    id: 'prod-shahi-mixture',
+    slug: 'shahi-mixture-namkeen',
+    name: 'Shahi Royal Dry Fruit Mixture',
+    hindiName: 'शाही ड्राई फ्रूट नमकीन',
+    category: 'namkeen',
+    subCategory: 'premium',
+    shortDescription: 'Regal blend of roasted California almonds, cashews, golden raisins, cornflakes & spiced potato matchsticks.',
+    description: 'An imperial savory snack fit for royalty. Made with abundant whole roasted dry fruits (cashews, almonds, raisins), crunchy potato lachha, golden roasted cornflakes, and a hint of sweet-tangy spice dust.',
+    ingredients: ['Cashew Nuts', 'California Almonds', 'Kishmish (Raisins)', 'Potato Lachha', 'Cornflakes', 'Gram Flour Sev', 'Coriander Seeds', 'Chat Masala', 'Refined Groundnut Oil'],
+    shelfLife: '75 Days',
+    storageInstructions: 'Store in a sealed tin or container at room temperature.',
+    allergenInfo: 'Contains Tree Nuts (Almonds, Cashews).',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 4.9,
+    reviewCount: 388,
+    images: [
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-shh-500g', weight: '500g', weightInGrams: 500, price: 290, mrp: 340, stock: 40, isDefault: true },
+      { id: 'var-shh-1kg', weight: '1kg', weightInGrams: 1000, price: 560, mrp: 650, stock: 20 },
+      { id: 'var-shh-250g', weight: '250g', weightInGrams: 250, price: 160, mrp: 185, stock: 50 }
+    ]
+  },
+  {
+    id: 'prod-heeng-sev',
+    slug: 'mathura-agra-heeng-sev',
+    name: 'Mathura-Agra Heeng Sev',
+    hindiName: 'हींग सेव',
+    category: 'namkeen',
+    subCategory: 'traditional',
+    shortDescription: 'Ultra-crispy golden besan sev spiked with authentic aromatic Hathras asafoetida (heeng).',
+    description: 'A timeless Braj region delicacy. Crispy extruded gram flour filaments seasoned with pungent, high-grade Hathras heeng, crushed peppercorns, and roasted cumin. Light on the stomach and irresistibly crunchy.',
+    ingredients: ['Gram Flour (Besan)', 'Edible Vegetable Oil', 'Hathras Heeng (Asafoetida)', 'Black Pepper', 'Cumin', 'Iodized Salt'],
+    shelfLife: '90 Days',
+    storageInstructions: 'Store in moisture-free container.',
+    allergenInfo: 'Gluten-Free.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: false,
+    rating: 4.8,
+    reviewCount: 230,
+    images: [
+      'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-hng-500g', weight: '500g', weightInGrams: 500, price: 160, mrp: 190, stock: 48, isDefault: true },
+      { id: 'var-hng-1kg', weight: '1kg', weightInGrams: 1000, price: 300, mrp: 360, stock: 30 },
+      { id: 'var-hng-250g', weight: '250g', weightInGrams: 250, price: 90, mrp: 110, stock: 65 }
+    ]
+  },
+  {
+    id: 'prod-navratan-mixture',
+    slug: 'navratan-mixture',
+    name: 'Navratan Royal 9-Gem Mixture',
+    hindiName: 'नवरत्न मिक्सचर',
+    category: 'namkeen',
+    subCategory: 'traditional',
+    shortDescription: 'Nine glorious crunch elements: peanuts, lentils, sev, boondi, potato crisp & spices.',
+    description: 'A harmonious symphony of nine distinct crunchy textures: crispy besan sev, spicy boondi, fried chana dal, masoor dal, crunchy roasted peanuts, and potato slivers kissed with chatpata masala.',
+    ingredients: ['Gram Flour', 'Lentils (Chana & Masoor)', 'Peanuts', 'Potato Flakes', 'Spices & Condiments', 'Refined Oil'],
+    shelfLife: '90 Days',
+    storageInstructions: 'Store in an airtight jar.',
+    allergenInfo: 'Contains Peanuts.',
+    isVegetarian: true,
+    isBestseller: false,
+    isFeatured: false,
+    rating: 4.7,
+    reviewCount: 176,
+    images: [
+      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-nav-500g', weight: '500g', weightInGrams: 500, price: 170, mrp: 200, stock: 42, isDefault: true },
+      { id: 'var-nav-1kg', weight: '1kg', weightInGrams: 1000, price: 320, mrp: 380, stock: 26 }
+    ]
+  },
+
+  // GIFT BOXES
+  {
+    id: 'prod-taj-heritage-box',
+    slug: 'taj-heritage-royal-gift-box',
+    name: 'Taj Heritage Royal Gift Box (Assorted)',
+    hindiName: 'ताज हेरिटेज रॉयल गिफ्ट बॉक्स',
+    category: 'gift-boxes',
+    subCategory: 'premium',
+    shortDescription: 'Luxurious velvet-embossed gift box featuring 4 iconic Petha varieties and Agra Dalmoth.',
+    description: 'The ultimate royal gift celebrating the splendor of Agra. Packed inside a handcrafted magenta and gold-embossed keepsake box. Contains Kesar Angoori Petha, Paan Petha, Chocolate Petha, Angoori Petha (250g each) and a 250g tin of authentic Agra Dalmoth.',
+    ingredients: ['Assorted Ash Gourd Sweets', 'Almonds', 'Cashews', 'Saffron', 'Moth Dal', 'Desi Ghee'],
+    shelfLife: '14 Days',
+    storageInstructions: 'Store sweets in refrigeration; keep Dalmoth dry.',
+    allergenInfo: 'Contains Nuts, Dairy and Coconut.',
+    isVegetarian: true,
+    isBestseller: true,
+    isFeatured: true,
+    rating: 5.0,
+    reviewCount: 164,
+    images: [
+      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'
+    ],
+    variants: [
+      { id: 'var-taj-1250g', weight: '1.25 kg Box', weightInGrams: 1250, price: 890, mrp: 1050, stock: 25, isDefault: true }
+    ]
+  }
+];
+
+export const INITIAL_COUPONS: Coupon[] = [
+  {
+    code: 'AGRA10',
+    description: 'Get 10% instant discount on your first order of authentic Agra sweets',
+    discountType: 'percentage',
+    discountValue: 10,
+    minOrderAmount: 399,
+    maxDiscount: 150,
+    isActive: true
+  },
+  {
+    code: 'BRIJWASI100',
+    description: 'Flat ₹100 OFF on orders above ₹699',
+    discountType: 'fixed',
+    discountValue: 100,
+    minOrderAmount: 699,
+    isActive: true
+  },
+  {
+    code: 'FESTIVE20',
+    description: 'Grand Festive Celebration - 20% OFF on orders above ₹1199',
+    discountType: 'percentage',
+    discountValue: 20,
+    minOrderAmount: 1199,
+    maxDiscount: 350,
+    isActive: true
+  }
+];
+
+export const INITIAL_REVIEWS: Review[] = [
+  {
+    id: 'rev-1',
+    productId: 'prod-kesar-angoori-petha',
+    productName: 'Shahi Kesar Angoori Petha',
+    customerName: 'Vikramaditya Sharma',
+    customerCity: 'New Delhi',
+    rating: 5,
+    comment: 'Having lived in Agra for 10 years during college, I desperately missed authentic petha in Delhi. Brijwasi Pethe Wale delivered it fresh within 24 hours. The saffron aroma and juicy texture were divine!',
+    date: '18 October 2026',
+    verifiedPurchase: true
+  },
+  {
+    id: 'rev-2',
+    productId: 'prod-agra-dalmoth',
+    productName: 'Authentic Agra Dalmoth',
+    customerName: 'Meenakshi Iyer',
+    customerCity: 'Bengaluru',
+    rating: 5,
+    comment: 'The Dalmoth fried in pure ghee with crunchy cashews is unmatched. Most online sellers send stale namkeen, but Brijwasi’s packaging was air-tight and fresh like it just came out of the kadai.',
+    date: '22 October 2026',
+    verifiedPurchase: true
+  },
+  {
+    id: 'rev-3',
+    productId: 'prod-paan-petha',
+    productName: 'Banarasi Gulkand Paan Petha',
+    customerName: 'Rajesh Singhania',
+    customerCity: 'Mumbai',
+    rating: 5,
+    comment: 'Ordered the Paan Petha for a family Diwali get-together. Every single guest praised it! Beautifully folded, moist, with genuine gulkand filling. 10/10.',
+    date: '25 October 2026',
+    verifiedPurchase: true
+  }
+];
