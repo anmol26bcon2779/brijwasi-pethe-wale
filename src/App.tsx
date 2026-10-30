@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { StoreProvider } from './context/StoreContext';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
@@ -73,7 +73,7 @@ const AppLayout: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <StoreProvider>
         <CartProvider>
           <AuthProvider>
@@ -81,7 +81,7 @@ export const App: React.FC = () => {
           </AuthProvider>
         </CartProvider>
       </StoreProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 

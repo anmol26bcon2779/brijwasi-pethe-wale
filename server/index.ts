@@ -80,14 +80,16 @@ app.use((req, res) => {
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`👑 Brijwasi Pethe Wale API Backend Server`);
-  console.log(`📍 Origin: Agra Heritage Mithai & Namkeen`);
-  console.log(`🚀 Live Port: http://localhost:${PORT}`);
-  console.log(`⚡ API Health: http://localhost:${PORT}/api/health`);
-  console.log(`====================================================`);
-});
+// Start Server if not in Vercel serverless environment
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`👑 Brijwasi Pethe Wale API Backend Server`);
+    console.log(`📍 Origin: Agra Heritage Mithai & Namkeen`);
+    console.log(`🚀 Live Port: http://localhost:${PORT}`);
+    console.log(`⚡ API Health: http://localhost:${PORT}/api/health`);
+    console.log(`====================================================`);
+  });
+}
 
 export default app;
