@@ -4,9 +4,9 @@ import { db } from '../db.js';
 const router = Router();
 
 // GET /api/settings
-router.get('/', (_req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
-    const settings = db.getSettings();
+    const settings = await db.getSettings();
     res.json({ success: true, data: settings });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -14,9 +14,9 @@ router.get('/', (_req: Request, res: Response) => {
 });
 
 // PUT /api/settings (Admin updates settings)
-router.put('/', (req: Request, res: Response) => {
+router.put('/', async (req: Request, res: Response) => {
   try {
-    const updated = db.updateSettings(req.body);
+    const updated = await db.updateSettings(req.body);
     res.json({ success: true, data: updated, message: 'Settings saved successfully' });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

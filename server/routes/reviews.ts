@@ -5,10 +5,10 @@ import { Review } from '../../src/types/index.js';
 const router = Router();
 
 // GET /api/reviews?productId=...
-router.get('/', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const { productId } = req.query;
-    const reviews = db.getReviews(productId ? String(productId) : undefined);
+    const reviews = await db.getReviews(productId ? String(productId) : undefined);
     res.json({ success: true, count: reviews.length, data: reviews });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -16,7 +16,7 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 // POST /api/reviews (Customer submits review)
-router.post('/', (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { productId, productName, customerName, customerCity, rating, comment } = req.body;
     if (!productId || !customerName || !rating || !comment) {
@@ -35,7 +35,7 @@ router.post('/', (req: Request, res: Response) => {
       verifiedPurchase: true
     };
 
-    const saved = db.addReview(newReview);
+    const saved = await db.addReview(newReview);
     res.status(201).json({ success: true, data: saved });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

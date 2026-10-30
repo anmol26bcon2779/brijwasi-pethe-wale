@@ -5,10 +5,10 @@ import { Product } from '../../src/types/index.js';
 const router = Router();
 
 // GET /api/products
-router.get('/', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const { category, search, bestseller, sort } = req.query;
-    let list = db.getProducts();
+    let list = await db.getProducts();
 
     if (category && category !== 'all') {
       list = list.filter(p => p.category === category);
@@ -43,10 +43,10 @@ router.get('/', (req: Request, res: Response) => {
 });
 
 // GET /api/products/:slugOrId
-router.get('/:slugOrId', (req: Request, res: Response) => {
+router.get('/:slugOrId', async (req: Request, res: Response) => {
   try {
     const identifier = Array.isArray(req.params.slugOrId) ? req.params.slugOrId[0] : req.params.slugOrId;
-    const product = db.getProductBySlugOrId(identifier);
+    const product = await db.getProductBySlugOrId(identifier);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Delicacy not found' });
     }
@@ -57,7 +57,7 @@ router.get('/:slugOrId', (req: Request, res: Response) => {
 });
 
 // POST /api/products (Admin)
-router.post('/', (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const body = req.body;
     if (!body.name || !body.category || !body.variants || !body.variants.length) {
@@ -66,7 +66,7 @@ router.post('/', (req: Request, res: Response) => {
 
     const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const newProduct: Product = {
-      id: `prod-${Date.now()}`,
+      id: body.id || `prod-${Date.now()}`,
       slug,
       name: body.name,
       hindiName: body.hindiName,
@@ -85,7 +85,7 @@ router.post('/', (req: Request, res: Response) => {
       variants: body.variants
     };
 
-    const created = db.addProduct(newProduct);
+    const created = await db.addProduct(newProduct);
     res.status(201).json({ success: true, data: created });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -93,15 +93,15 @@ router.post('/', (req: Request, res: Response) => {
 });
 
 // PUT /api/products/:id (Admin)
-router.put('/:id', (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const existing = db.getProductBySlugOrId(id);
+    const existing = await db.getProductBySlugOrId(id);
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    const updated = db.updateProduct({
+    const updated = await db.updateProduct({
       ...existing,
       ...req.body,
       id: existing.id // protect ID
@@ -114,14 +114,14 @@ router.put('/:id', (req: Request, res: Response) => {
 });
 
 // DELETE /api/products/:id (Admin)
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const existing = db.getProductBySlugOrId(id);
+    const existing = await db.getProductBySlugOrId(id);
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
-    db.deleteProduct(existing.id);
+    await db.deleteProduct(existing.id);
     res.json({ success: true, message: `Product ${existing.name} removed successfully` });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });

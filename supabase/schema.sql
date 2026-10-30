@@ -1,212 +1,287 @@
 -- ==============================================================================
--- Brijwasi Pethe Wale - Production Supabase PostgreSQL Schema & RLS Policies
+-- Brijwasi Pethe Wale — Complete Production Database Schema & RLS Policies
+-- Compatibility: Express Backend, React Frontend, Supabase PostgreSQL
+-- Non-Destructive: Safe to run on new or existing Supabase instances
 -- ==============================================================================
 
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
+-- 1. Enable Cryptographic & UUID Extensions (if not already enabled)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. CATEGORIES TABLE
-create table if not exists public.categories (
-    id uuid primary key default uuid_generate_v4(),
-    slug text unique not null,
-    name text not null,
-    description text,
-    image_url text,
-    display_order int default 0,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+-- 2. CATEGORIES TABLE
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.categories (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    slug TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    image_url TEXT,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. PRODUCTS TABLE
-create table if not exists public.products (
-    id uuid primary key default uuid_generate_v4(),
-    slug text unique not null,
-    name text not null,
-    hindi_name text,
-    category_id uuid references public.categories(id) on delete set null,
-    short_description text not null,
-    description text not null,
-    ingredients text[] not null default '{}',
-    shelf_life text not null,
-    storage_instructions text not null,
-    allergen_info text,
-    is_vegetarian boolean default true,
-    is_bestseller boolean default false,
-    is_featured boolean default false,
-    rating numeric(3, 2) default 4.8,
-    review_count int default 0,
-    images text[] not null default '{}',
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+-- 3. PRODUCTS TABLE
+-- Compatible with Product interface in src/types/index.ts
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.products (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    slug TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    hindi_name TEXT,
+    category TEXT NOT NULL, -- 'petha' | 'namkeen' | 'gift-boxes'
+    sub_category TEXT,       -- 'traditional' | 'flavoured' | 'premium' | 'dry' | 'syrup'
+    short_description TEXT NOT NULL,
+    description TEXT NOT NULL,
+    ingredients TEXT[] NOT NULL DEFAULT '{}',
+    shelf_life TEXT NOT NULL,
+    storage_instructions TEXT NOT NULL,
+    allergen_info TEXT,
+    is_vegetarian BOOLEAN DEFAULT true NOT NULL,
+    is_bestseller BOOLEAN DEFAULT false,
+    is_featured BOOLEAN DEFAULT false,
+    rating NUMERIC(3, 2) DEFAULT 4.9,
+    review_count INT DEFAULT 0,
+    images TEXT[] NOT NULL DEFAULT '{}',
+    nutritional_info JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. PRODUCT VARIANTS TABLE
-create table if not exists public.product_variants (
-    id uuid primary key default uuid_generate_v4(),
-    product_id uuid references public.products(id) on delete cascade not null,
-    weight text not null, -- e.g. "250g", "500g", "1kg"
-    weight_in_grams int not null,
-    price numeric(10, 2) not null,
-    mrp numeric(10, 2) not null,
-    stock int not null default 50,
-    sku text unique,
-    is_default boolean default false,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+-- 4. PRODUCT VARIANTS TABLE
+-- Compatible with ProductVariant interface (weight, price, mrp, stock)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.product_variants (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    product_id TEXT REFERENCES public.products(id) ON DELETE CASCADE,
+    weight TEXT NOT NULL,            -- e.g. "250g", "500g", "1kg"
+    weight_in_grams INT NOT NULL,     -- e.g. 250, 500, 1000
+    price NUMERIC(10, 2) NOT NULL,
+    mrp NUMERIC(10, 2) NOT NULL,
+    stock INT NOT NULL DEFAULT 50,
+    sku TEXT,
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. CUSTOMERS TABLE
-create table if not exists public.customers (
-    id uuid primary key default uuid_generate_v4(),
-    auth_user_id uuid references auth.users(id) on delete cascade,
-    email text unique,
-    full_name text not null,
-    phone text not null,
-    role text default 'customer' check (role in ('customer', 'admin')),
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+-- 5. CUSTOMERS TABLE
+-- Tracks registered customers and admin roles
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.customers (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    auth_user_id UUID,
+    email TEXT,
+    full_name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    role TEXT DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. ADDRESSES TABLE
-create table if not exists public.addresses (
-    id uuid primary key default uuid_generate_v4(),
-    customer_id uuid references public.customers(id) on delete cascade not null,
-    full_name text not null,
-    phone text not null,
-    address_line1 text not null,
-    address_line2 text,
-    city text not null,
-    state text not null,
-    pincode text not null,
-    is_default boolean default false,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
+-- ==============================================================================
 -- 6. ORDERS TABLE
-create table if not exists public.orders (
-    id uuid primary key default uuid_generate_v4(),
-    order_number text unique not null,
-    customer_id uuid references public.customers(id) on delete set null,
-    customer_name text not null,
-    customer_email text not null,
-    customer_phone text not null,
-    shipping_address jsonb not null,
-    subtotal numeric(10, 2) not null,
-    discount numeric(10, 2) default 0,
-    shipping_fee numeric(10, 2) default 0,
-    total numeric(10, 2) not null,
-    status text not null default 'Pending' check (status in ('Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled')),
-    payment_method text not null check (payment_method in ('COD', 'Razorpay', 'Card', 'UPI')),
-    payment_status text not null default 'Pending' check (payment_status in ('Pending', 'Paid', 'Failed', 'Refunded')),
-    razorpay_order_id text,
-    razorpay_payment_id text,
-    coupon_applied text,
-    tracking_number text,
-    courier_partner text,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- Tracks all customer orders, payment, shipping address, and tracking status
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.orders (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    order_number TEXT UNIQUE NOT NULL, -- e.g. "BPW-2026-490212"
+    customer_id TEXT REFERENCES public.customers(id) ON DELETE SET NULL,
+    customer_name TEXT NOT NULL,
+    customer_email TEXT,
+    customer_phone TEXT NOT NULL,
+    shipping_address JSONB NOT NULL,
+    subtotal NUMERIC(10, 2) NOT NULL,
+    discount NUMERIC(10, 2) DEFAULT 0,
+    shipping_fee NUMERIC(10, 2) DEFAULT 0,
+    total NUMERIC(10, 2) NOT NULL,
+    coupon_applied TEXT,
+    status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Confirmed', 'Processing', 'Packed', 'Shipped', 'Delivered', 'Cancelled')),
+    payment_method TEXT NOT NULL CHECK (payment_method IN ('COD', 'Razorpay', 'Card', 'UPI')),
+    payment_status TEXT NOT NULL DEFAULT 'Pending' CHECK (payment_status IN ('Pending', 'Paid', 'Failed', 'Refunded')),
+    razorpay_order_id TEXT,
+    razorpay_payment_id TEXT,
+    tracking_number TEXT,
+    courier_partner TEXT,
+    status_timeline JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- ==============================================================================
 -- 7. ORDER ITEMS TABLE
-create table if not exists public.order_items (
-    id uuid primary key default uuid_generate_v4(),
-    order_id uuid references public.orders(id) on delete cascade not null,
-    product_id uuid references public.products(id) on delete set null,
-    variant_id uuid references public.product_variants(id) on delete set null,
-    product_name text not null,
-    variant_weight text not null,
-    unit_price numeric(10, 2) not null,
-    quantity int not null,
-    total_price numeric(10, 2) not null,
-    image_url text
+-- Individual items inside each order
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.order_items (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    order_id TEXT REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
+    product_id TEXT REFERENCES public.products(id) ON DELETE SET NULL,
+    variant_id TEXT,
+    product_name TEXT NOT NULL,
+    weight TEXT NOT NULL,
+    unit_price NUMERIC(10, 2) NOT NULL,
+    quantity INT NOT NULL,
+    total_price NUMERIC(10, 2) NOT NULL,
+    image_url TEXT
 );
 
+-- ==============================================================================
 -- 8. COUPONS TABLE
-create table if not exists public.coupons (
-    id uuid primary key default uuid_generate_v4(),
-    code text unique not null,
-    description text not null,
-    discount_type text not null check (discount_type in ('percentage', 'fixed')),
-    discount_value numeric(10, 2) not null,
-    min_order_amount numeric(10, 2) default 0,
-    max_discount numeric(10, 2),
-    is_active boolean default true,
-    expires_at timestamp with time zone,
-    usage_count int default 0,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.coupons (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    code TEXT UNIQUE NOT NULL,
+    description TEXT NOT NULL,
+    discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+    discount_value NUMERIC(10, 2) NOT NULL,
+    min_order_amount NUMERIC(10, 2) DEFAULT 0,
+    max_discount NUMERIC(10, 2),
+    is_active BOOLEAN DEFAULT true NOT NULL,
+    expires_at TIMESTAMPTZ,
+    usage_count INT DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- ==============================================================================
 -- 9. REVIEWS TABLE
-create table if not exists public.reviews (
-    id uuid primary key default uuid_generate_v4(),
-    product_id uuid references public.products(id) on delete cascade not null,
-    customer_name text not null,
-    rating int not null check (rating between 1 and 5),
-    comment text not null,
-    is_verified_purchase boolean default true,
-    is_approved boolean default true,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    product_id TEXT REFERENCES public.products(id) ON DELETE CASCADE,
+    product_name TEXT NOT NULL,
+    customer_name TEXT NOT NULL,
+    customer_city TEXT,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT NOT NULL,
+    verified_purchase BOOLEAN DEFAULT true,
+    is_approved BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- ==============================================================================
 -- 10. STORE SETTINGS TABLE
-create table if not exists public.store_settings (
-    id int primary key default 1,
-    store_name text not null default 'Brijwasi Pethe Wale',
-    tagline text not null default 'The Royal Heritage Taste of Agra',
-    announcement_bar text not null default '✨ Authentic Agra Petha & Namkeen Delivered Fresh Across India | Free Shipping Above ₹799',
-    phone text not null default '+91 98970 00000',
-    email text not null default 'orders@brijwasipethewale.com',
-    address text not null default 'Shop No. 12, Near Taj Mahal Eastern Gate, Fatehabad Road, Agra, Uttar Pradesh - 282001',
-    standard_shipping_fee numeric(10, 2) default 99,
-    free_shipping_threshold numeric(10, 2) default 799,
-    is_cod_enabled boolean default true,
-    cod_fee numeric(10, 2) default 49,
-    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.store_settings (
+    id INT PRIMARY KEY DEFAULT 1,
+    store_name TEXT NOT NULL DEFAULT 'Brijwasi Pethe Wale',
+    tagline TEXT NOT NULL DEFAULT 'Experience the Royal Sweetness of Agra',
+    announcement_bar TEXT NOT NULL DEFAULT '✨ Authentic Taste of Agra | Traditional Sweets Delivered Fresh Across India | Free Shipping Above ₹799',
+    phone TEXT NOT NULL DEFAULT '+91 98970 23456',
+    whatsapp TEXT NOT NULL DEFAULT '+91 98970 23456',
+    email TEXT NOT NULL DEFAULT 'care@brijwasipethewale.com',
+    address TEXT NOT NULL DEFAULT 'Shop No. 14, Eastern Gate Market, Near Taj Mahal, Fatehabad Road',
+    city TEXT NOT NULL DEFAULT 'Agra',
+    state TEXT NOT NULL DEFAULT 'Uttar Pradesh',
+    pincode TEXT NOT NULL DEFAULT '282001',
+    standard_shipping_fee NUMERIC(10, 2) DEFAULT 80,
+    free_shipping_threshold NUMERIC(10, 2) DEFAULT 799,
+    is_cod_enabled BOOLEAN DEFAULT true,
+    cod_fee NUMERIC(10, 2) DEFAULT 40,
+    razorpay_key_id TEXT,
+    updated_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- ==============================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- 11. INITIAL SEED DATA (SAFE IDEMPOTENT INSERTS)
 -- ==============================================================================
-alter table public.categories enable row level security;
-alter table public.products enable row level security;
-alter table public.product_variants enable row level security;
-alter table public.customers enable row level security;
-alter table public.addresses enable row level security;
-alter table public.orders enable row level security;
-alter table public.order_items enable row level security;
-alter table public.coupons enable row level security;
-alter table public.reviews enable row level security;
-alter table public.store_settings enable row level security;
 
--- Public can view active categories, products, variants, approved reviews, and store settings
-create policy "Allow public read access to categories" on public.categories for select using (true);
-create policy "Allow public read access to products" on public.products for select using (true);
-create policy "Allow public read access to product_variants" on public.product_variants for select using (true);
-create policy "Allow public read access to active coupons" on public.coupons for select using (is_active = true);
-create policy "Allow public read access to approved reviews" on public.reviews for select using (is_approved = true);
-create policy "Allow public read access to store settings" on public.store_settings for select using (true);
+-- Store Settings Seed
+INSERT INTO public.store_settings (id, store_name, tagline, announcement_bar, phone, whatsapp, email, address, city, state, pincode, standard_shipping_fee, free_shipping_threshold, is_cod_enabled, cod_fee)
+VALUES (
+    1,
+    'Brijwasi Pethe Wale',
+    'Experience the Royal Sweetness of Agra',
+    '✨ Authentic Taste of Agra | Traditional Sweets Delivered Fresh Across India | Free Shipping Above ₹799',
+    '+91 98970 23456',
+    '+91 98970 23456',
+    'care@brijwasipethewale.com',
+    'Shop No. 14, Eastern Gate Market, Near Taj Mahal, Fatehabad Road',
+    'Agra',
+    'Uttar Pradesh',
+    '282001',
+    80,
+    799,
+    true,
+    40
+)
+ON CONFLICT (id) DO NOTHING;
 
--- Customers can view their own orders & insert new orders
-create policy "Allow customer to insert order" on public.orders for insert with check (true);
-create policy "Allow customer to read own order" on public.orders for select using (
-    auth.uid() is null or customer_id in (select id from public.customers where auth_user_id = auth.uid())
-);
-create policy "Allow order items read for orders" on public.order_items for select using (true);
-create policy "Allow order items insert" on public.order_items for insert with check (true);
+-- Initial Categories
+INSERT INTO public.categories (slug, name, description, display_order)
+VALUES 
+    ('petha', 'Agra Petha Collection', 'Traditional ash gourd delicacies cooked to perfection in fragrant syrups and royal flavours.', 1),
+    ('namkeen', 'Artisanal Agra Namkeen', 'Crisp, spicy, and authentic savory namkeens including famous Agra Dalmoth.', 2),
+    ('gift-boxes', 'Royal Gift Boxes', 'Handcrafted festive assorted mithai boxes packed in royal Mughal presentation.', 3)
+ON CONFLICT (slug) DO NOTHING;
 
--- Admin full access policies (checks if user has admin role in customers table or service role)
-create policy "Admin full access to categories" on public.categories for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
-create policy "Admin full access to products" on public.products for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
-create policy "Admin full access to variants" on public.product_variants for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
-create policy "Admin full access to orders" on public.orders for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
-create policy "Admin full access to coupons" on public.coupons for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
-create policy "Admin full access to settings" on public.store_settings for all using (
-    exists (select 1 from public.customers where auth_user_id = auth.uid() and role = 'admin')
-);
+-- Initial Coupons
+INSERT INTO public.coupons (code, description, discount_type, discount_value, min_order_amount, is_active)
+VALUES 
+    ('AGRA10', 'Flat 10% off on authentic Agra delicacies above ₹499', 'percentage', 10, 499, true),
+    ('ROYAL50', 'Flat ₹50 instant discount on royal orders above ₹699', 'fixed', 50, 699, true),
+    ('FESTIVE15', 'Festive Celebration 15% discount on orders above ₹999', 'percentage', 15, 999, true)
+ON CONFLICT (code) DO NOTHING;
+
+-- ==============================================================================
+-- 12. ROW LEVEL SECURITY (RLS) POLICIES
+-- ==============================================================================
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+
+-- Helper block to safely create policies without errors if they already exist
+DO $$
+BEGIN
+    -- Public Read Policies
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view categories') THEN
+        CREATE POLICY "Public can view categories" ON public.categories FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view products') THEN
+        CREATE POLICY "Public can view products" ON public.products FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view product variants') THEN
+        CREATE POLICY "Public can view product variants" ON public.product_variants FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view active coupons') THEN
+        CREATE POLICY "Public can view active coupons" ON public.coupons FOR SELECT USING (is_active = true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view approved reviews') THEN
+        CREATE POLICY "Public can view approved reviews" ON public.reviews FOR SELECT USING (is_approved = true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view store settings') THEN
+        CREATE POLICY "Public can view store settings" ON public.store_settings FOR SELECT USING (true);
+    END IF;
+
+    -- Order creation & tracking policies for customers
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Anyone can create orders') THEN
+        CREATE POLICY "Anyone can create orders" ON public.orders FOR INSERT WITH CHECK (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Customers can track own orders by order number or email') THEN
+        CREATE POLICY "Customers can track own orders by order number or email" ON public.orders FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Anyone can insert order items') THEN
+        CREATE POLICY "Anyone can insert order items" ON public.order_items FOR INSERT WITH CHECK (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view order items') THEN
+        CREATE POLICY "Public can view order items" ON public.order_items FOR SELECT USING (true);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Customers can submit reviews') THEN
+        CREATE POLICY "Customers can submit reviews" ON public.reviews FOR INSERT WITH CHECK (true);
+    END IF;
+END $$;
