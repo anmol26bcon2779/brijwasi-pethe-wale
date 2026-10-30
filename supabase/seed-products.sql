@@ -1,0 +1,1485 @@
+-- ==============================================================================
+-- Brijwasi Pethe Wale — 14 Authentic Products & Variants Migration SQL
+-- Idempotent: Safe to run multiple times without creating duplicates
+-- ==============================================================================
+
+-- 1. INSERT / UPSERT PRODUCTS
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-angoori-petha',
+    'angoori-petha',
+    'Royal Angoori Petha',
+    'अंगूरी पेठा',
+    'petha',
+    'syrup',
+    'Grape-sized translucent succulent ash gourd pearls gently simmered in fragrant saffron-infused sugar elixir.',
+    'Our signature delicacy from the heart of Agra. Angoori Petha is crafted from premium winter melon (ash gourd), delicately peeled and carved into grape-sized bite-sized globes. Each piece is simmered slowly in a clarified sugar syrup perfumed with pure kewra water and green cardamom, creating an exquisite melt-in-mouth burst of authentic royal sweetness.',
+    ARRAY['Winter Melon (White Ash Gourd)', 'Sugar', 'Purified Water', 'Kewra Water', 'Green Cardamom'],
+    '12-15 Days (Keep refrigerated for optimal freshness)',
+    'Store in an airtight container under refrigeration once opened. Consume chilled for best taste.',
+    'Made in a facility that also processes tree nuts and milk solids.',
+    true,
+    true,
+    true,
+    4.9,
+    342,
+    ARRAY['https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'],
+    '{"calories":"320 kcal per 100g","carbohydrates":"78g","protein":"0.8g","fat":"0.2g"}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-kesar-angoori-petha',
+    'kesar-angoori-petha',
+    'Shahi Kesar Angoori Petha',
+    'शाही केसर अंगूरी पेठा',
+    'petha',
+    'premium',
+    'Golden translucent petha pearls soaked in authentic Kashmiri saffron strands and silver vark.',
+    'A royal creation steeped in Mughal heritage. Prime hand-carved ash gourd globes are enriched with original Mogra saffron from the valleys of Kashmir. Every bite offers a luminous golden color, exquisite floral saffron aroma, and deeply satisfying natural sweet juice.',
+    ARRAY['Winter Melon (Ash Gourd)', 'Sugar', 'Pure Kashmiri Saffron (Kesar)', 'Cardamom Extract', 'Rose Water'],
+    '14 Days (Refrigerate after opening)',
+    'Keep in cool refrigeration. Do not expose to direct sunlight.',
+    '100% Nut Free and Dairy Free.',
+    true,
+    true,
+    true,
+    5,
+    428,
+    ARRAY['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-paan-petha',
+    'paan-petha',
+    'Banarasi Gulkand Paan Petha',
+    'शाही पान पेठा',
+    'petha',
+    'flavoured',
+    'Delicate emerald petha parcels folded like royal betel paan, stuffed with aromatic gulkand, fennel & dry fruits.',
+    'An artistic culinary tribute marrying the iconic Agra petha with the imperial after-dinner tradition of Banarasi Paan. Thin layers of tender green petha are hand-folded into royal triangles, encapsulating a fragrant filling of damask rose gulkand, crushed almonds, pistachios, saunf, and aromatic spices.',
+    ARRAY['Ash Gourd', 'Sugar', 'Natural Betel Extract', 'Organic Damask Rose Gulkand', 'Almonds', 'Pistachios', 'Fennel Seeds', 'Cardamom'],
+    '10-12 Days',
+    'Store in airtight box inside refrigerator. Best served chilled.',
+    'Contains Tree Nuts (Almonds, Pistachios).',
+    true,
+    true,
+    true,
+    4.8,
+    290,
+    ARRAY['https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-chocolate-petha',
+    'chocolate-petha',
+    'Belgian Cocoa Chocolate Petha',
+    'चॉकलेट पेठा',
+    'petha',
+    'flavoured',
+    'Modern indulgence meets heritage craft: Juicy Agra petha enrobed in a velvety decadent cocoa glaze.',
+    'A revolutionary fusion beloved by children and youth alike! Crisp yet juicy Agra petha cubes are infused with rich, velvety dark Dutch cocoa and milk chocolate notes. The delicate crunch of candied ash gourd blends effortlessly with rich chocolate bliss.',
+    ARRAY['Ash Gourd', 'Sugar', 'Pure Cocoa Powder', 'Milk Solids', 'Vanilla Extract', 'Kewra'],
+    '20 Days',
+    'Store in cool and dry place away from heat and moisture.',
+    'Contains Milk Solids.',
+    true,
+    false,
+    true,
+    4.7,
+    185,
+    ARRAY['https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-coconut-petha',
+    'coconut-petha',
+    'Nariyal (Coconut) Petha',
+    'नारियल पेठा',
+    'petha',
+    'flavoured',
+    'Soft tender petha cubes rolled in freshly toasted aromatic Malabar coconut flakes.',
+    'A heavenly tropical balance. We take soft, juicy, crystallized Agra petha and generously roll it in fine desiccated coconut toasted to gentle perfection. The fragrant texture of coconut complements the moist core wonderfully.',
+    ARRAY['Ash Gourd', 'Sugar', 'Desiccated Coconut Flakes', 'Cardamom', 'Purified Water'],
+    '18 Days',
+    'Store in a dry airtight container.',
+    'Contains Coconut.',
+    true,
+    false,
+    false,
+    4.7,
+    142,
+    ARRAY['https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-mango-petha',
+    'mango-petha',
+    'Alphonso Mango Petha',
+    'अल्फांसो आम पेठा',
+    'petha',
+    'flavoured',
+    'Sun-ripened Ratnagiri Alphonso mango pulp infused with tender, juicy Agra petha squares.',
+    'Bursting with tropical delight. Created by steeping natural Alphonso mango puree into freshly carved petha. Refreshing, vibrant orange hue and an intoxicating fruity fragrance that elevates traditional sweetness into sheer joy.',
+    ARRAY['White Gourd', 'Sugar', 'Alphonso Mango Pulp', 'Citric Acid', 'Natural Mango Extract'],
+    '15 Days',
+    'Refrigerate once received. Keep sealed.',
+    'Free from synthetic chemicals.',
+    true,
+    false,
+    false,
+    4.8,
+    167,
+    ARRAY['https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-gulab-laddu-petha',
+    'gulab-laddu-petha',
+    'Gulab Laddu Petha',
+    'गुलाब लड्डू पेठा',
+    'petha',
+    'premium',
+    'Spherical rose-scented petha laddus infused with edible rose petals, pistachios & cardamom.',
+    'Shaped like celebratory round laddus, this delicacy is hand-rolled from finely grated petha bound with fragrant Damascus rose water and encrusted with crushed Persian pistachios and wild rose petals.',
+    ARRAY['Ash Gourd', 'Sugar', 'Pure Rose Petals', 'Rose Water', 'Pistachios', 'Elaichi'],
+    '15 Days',
+    'Store in cool and dry place in a tight lid box.',
+    'Contains Pistachios.',
+    true,
+    true,
+    true,
+    4.9,
+    210,
+    ARRAY['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-shalimar-petha',
+    'shalimar-petha',
+    'Royal Shalimar Petha',
+    'शालीमार पेठा',
+    'petha',
+    'premium',
+    'Multi-layered jewel sweet combining kesar, pista, and mawa stuffed inside tender petha ribbons.',
+    'Inspired by the imperial gardens of the Mughal emperors. Shalimar petha brings together multi-layered craftsmanship: golden saffron outer layers wrapped lovingly around khoya, crushed almonds, and green cardamom.',
+    ARRAY['Ash Gourd', 'Pure Khoya / Mawa', 'Sugar', 'Kashmiri Saffron', 'Pistachios', 'Almonds', 'Cardamom'],
+    '8-10 Days (Refrigerate promptly)',
+    'Must keep strictly refrigerated under 5°C.',
+    'Contains Dairy (Khoya/Milk) and Nuts (Almonds, Pistachios).',
+    true,
+    true,
+    true,
+    5,
+    312,
+    ARRAY['https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-rasbhari-petha',
+    'rasbhari-petha',
+    'Rasbhari Kesar Petha',
+    'रसभरी केसर पेठा',
+    'petha',
+    'syrup',
+    'Extra juicy, spongy Agra petha bursting with thick saffron and rose scented syrup.',
+    'The epitome of Agra street indulgence. Rasbhari petha translates to "overflowing with nectar." Every single cube holds immense fragrant saffron syrup that gushes upon first bite.',
+    ARRAY['Winter Melon', 'Sugar', 'Saffron', 'Kewra Essence', 'Cardamom'],
+    '14 Days',
+    'Store in refrigerator container. Serve chilled.',
+    '100% Nut Free and Vegan.',
+    true,
+    false,
+    false,
+    4.8,
+    195,
+    ARRAY['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-agra-dalmoth',
+    'agra-dalmoth-namkeen',
+    'Authentic Agra Dalmoth',
+    'आगरा की प्रसिद्ध दालमोठ',
+    'namkeen',
+    'traditional',
+    'World-renowned spicy fried moth lentils, golden sev, cashews & musk melon seeds roasted in pure desi ghee.',
+    'The legendary namkeen that Agra is famous for across the globe. Carefully selected whole brown moth beans (dew gram) are soaked, fried to crunchy perfection in pure ghee, and tossed with roasted cashews, musk melon seeds (magaz), crispy sev, and an ancestral blend of dry mango powder (amchur), black pepper, and clove spices.',
+    ARRAY['Moth Dal (Dew Gram)', 'Gram Flour (Besan)', 'Pure Desi Ghee', 'Whole Cashews', 'Melon Seeds (Magaz)', 'Black Pepper', 'Amchur', 'Hing', 'Rock Salt'],
+    '90 Days',
+    'Store in a cool dry place in an airtight jar. Keep away from moisture.',
+    'Contains Cashews and Gram Flour (Besan).',
+    true,
+    true,
+    true,
+    4.9,
+    512,
+    ARRAY['https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80'],
+    '{"calories":"495 kcal per 100g","carbohydrates":"42g","protein":"14.5g","fat":"28g"}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-shahi-mixture',
+    'shahi-mixture-namkeen',
+    'Shahi Royal Dry Fruit Mixture',
+    'शाही ड्राई फ्रूट नमकीन',
+    'namkeen',
+    'premium',
+    'Regal blend of roasted California almonds, cashews, golden raisins, cornflakes & spiced potato matchsticks.',
+    'An imperial savory snack fit for royalty. Made with abundant whole roasted dry fruits (cashews, almonds, raisins), crunchy potato lachha, golden roasted cornflakes, and a hint of sweet-tangy spice dust.',
+    ARRAY['Cashew Nuts', 'California Almonds', 'Kishmish (Raisins)', 'Potato Lachha', 'Cornflakes', 'Gram Flour Sev', 'Coriander Seeds', 'Chat Masala', 'Refined Groundnut Oil'],
+    '75 Days',
+    'Store in a sealed tin or container at room temperature.',
+    'Contains Tree Nuts (Almonds, Cashews).',
+    true,
+    true,
+    true,
+    4.9,
+    388,
+    ARRAY['https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-heeng-sev',
+    'mathura-agra-heeng-sev',
+    'Mathura-Agra Heeng Sev',
+    'हींग सेव',
+    'namkeen',
+    'traditional',
+    'Ultra-crispy golden besan sev spiked with authentic aromatic Hathras asafoetida (heeng).',
+    'A timeless Braj region delicacy. Crispy extruded gram flour filaments seasoned with pungent, high-grade Hathras heeng, crushed peppercorns, and roasted cumin. Light on the stomach and irresistibly crunchy.',
+    ARRAY['Gram Flour (Besan)', 'Edible Vegetable Oil', 'Hathras Heeng (Asafoetida)', 'Black Pepper', 'Cumin', 'Iodized Salt'],
+    '90 Days',
+    'Store in moisture-free container.',
+    'Gluten-Free.',
+    true,
+    false,
+    false,
+    4.8,
+    230,
+    ARRAY['https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-navratan-mixture',
+    'navratan-mixture',
+    'Navratan Royal 9-Gem Mixture',
+    'नवरत्न मिक्सचर',
+    'namkeen',
+    'traditional',
+    'Nine glorious crunch elements: peanuts, lentils, sev, boondi, potato crisp & spices.',
+    'A harmonious symphony of nine distinct crunchy textures: crispy besan sev, spicy boondi, fried chana dal, masoor dal, crunchy roasted peanuts, and potato slivers kissed with chatpata masala.',
+    ARRAY['Gram Flour', 'Lentils (Chana & Masoor)', 'Peanuts', 'Potato Flakes', 'Spices & Condiments', 'Refined Oil'],
+    '90 Days',
+    'Store in an airtight jar.',
+    'Contains Peanuts.',
+    true,
+    false,
+    false,
+    4.7,
+    176,
+    ARRAY['https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+INSERT INTO public.products (
+    id, slug, name, hindi_name, category, sub_category,
+    short_description, description, ingredients, shelf_life,
+    storage_instructions, allergen_info, is_vegetarian,
+    is_bestseller, is_featured, rating, review_count, images,
+    nutritional_info, created_at, updated_at
+) VALUES (
+    'prod-taj-heritage-box',
+    'taj-heritage-royal-gift-box',
+    'Taj Heritage Royal Gift Box (Assorted)',
+    'ताज हेरिटेज रॉयल गिफ्ट बॉक्स',
+    'gift-boxes',
+    'premium',
+    'Luxurious velvet-embossed gift box featuring 4 iconic Petha varieties and Agra Dalmoth.',
+    'The ultimate royal gift celebrating the splendor of Agra. Packed inside a handcrafted magenta and gold-embossed keepsake box. Contains Kesar Angoori Petha, Paan Petha, Chocolate Petha, Angoori Petha (250g each) and a 250g tin of authentic Agra Dalmoth.',
+    ARRAY['Assorted Ash Gourd Sweets', 'Almonds', 'Cashews', 'Saffron', 'Moth Dal', 'Desi Ghee'],
+    '14 Days',
+    'Store sweets in refrigeration; keep Dalmoth dry.',
+    'Contains Nuts, Dairy and Coconut.',
+    true,
+    true,
+    true,
+    5,
+    164,
+    ARRAY['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'],
+    '{}'::jsonb,
+    NOW(),
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    hindi_name = EXCLUDED.hindi_name,
+    category = EXCLUDED.category,
+    sub_category = EXCLUDED.sub_category,
+    short_description = EXCLUDED.short_description,
+    description = EXCLUDED.description,
+    ingredients = EXCLUDED.ingredients,
+    shelf_life = EXCLUDED.shelf_life,
+    storage_instructions = EXCLUDED.storage_instructions,
+    allergen_info = EXCLUDED.allergen_info,
+    is_vegetarian = EXCLUDED.is_vegetarian,
+    is_bestseller = EXCLUDED.is_bestseller,
+    is_featured = EXCLUDED.is_featured,
+    rating = EXCLUDED.rating,
+    review_count = EXCLUDED.review_count,
+    images = EXCLUDED.images,
+    nutritional_info = EXCLUDED.nutritional_info,
+    updated_at = NOW();
+
+-- 2. INSERT / UPSERT PRODUCT VARIANTS
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ang-500g',
+    'prod-angoori-petha',
+    '500g',
+    500,
+    190,
+    220,
+    45,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ang-1kg',
+    'prod-angoori-petha',
+    '1kg',
+    1000,
+    360,
+    420,
+    30,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ang-250g',
+    'prod-angoori-petha',
+    '250g',
+    250,
+    110,
+    130,
+    50,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ksr-500g',
+    'prod-kesar-angoori-petha',
+    '500g',
+    500,
+    240,
+    280,
+    40,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ksr-1kg',
+    'prod-kesar-angoori-petha',
+    '1kg',
+    1000,
+    460,
+    540,
+    25,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-ksr-250g',
+    'prod-kesar-angoori-petha',
+    '250g',
+    250,
+    135,
+    160,
+    60,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-pan-500g',
+    'prod-paan-petha',
+    '500g',
+    500,
+    230,
+    270,
+    35,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-pan-1kg',
+    'prod-paan-petha',
+    '1kg',
+    1000,
+    440,
+    520,
+    20,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-pan-250g',
+    'prod-paan-petha',
+    '250g',
+    250,
+    130,
+    150,
+    45,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-choc-500g',
+    'prod-chocolate-petha',
+    '500g',
+    500,
+    220,
+    260,
+    30,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-choc-1kg',
+    'prod-chocolate-petha',
+    '1kg',
+    1000,
+    420,
+    500,
+    15,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-choc-250g',
+    'prod-chocolate-petha',
+    '250g',
+    250,
+    125,
+    150,
+    40,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-coc-500g',
+    'prod-coconut-petha',
+    '500g',
+    500,
+    200,
+    240,
+    28,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-coc-1kg',
+    'prod-coconut-petha',
+    '1kg',
+    1000,
+    380,
+    450,
+    20,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-coc-250g',
+    'prod-coconut-petha',
+    '250g',
+    250,
+    115,
+    140,
+    35,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-mng-500g',
+    'prod-mango-petha',
+    '500g',
+    500,
+    210,
+    250,
+    32,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-mng-1kg',
+    'prod-mango-petha',
+    '1kg',
+    1000,
+    400,
+    480,
+    18,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-glb-500g',
+    'prod-gulab-laddu-petha',
+    '500g',
+    500,
+    230,
+    270,
+    24,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-glb-1kg',
+    'prod-gulab-laddu-petha',
+    '1kg',
+    1000,
+    440,
+    520,
+    16,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-shl-500g',
+    'prod-shalimar-petha',
+    '500g',
+    500,
+    260,
+    300,
+    22,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-shl-1kg',
+    'prod-shalimar-petha',
+    '1kg',
+    1000,
+    500,
+    580,
+    12,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-rsb-500g',
+    'prod-rasbhari-petha',
+    '500g',
+    500,
+    195,
+    230,
+    35,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-rsb-1kg',
+    'prod-rasbhari-petha',
+    '1kg',
+    1000,
+    370,
+    440,
+    25,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-dlm-500g',
+    'prod-agra-dalmoth',
+    '500g',
+    500,
+    240,
+    280,
+    55,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-dlm-1kg',
+    'prod-agra-dalmoth',
+    '1kg',
+    1000,
+    460,
+    540,
+    35,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-dlm-250g',
+    'prod-agra-dalmoth',
+    '250g',
+    250,
+    130,
+    150,
+    70,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-shh-500g',
+    'prod-shahi-mixture',
+    '500g',
+    500,
+    290,
+    340,
+    40,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-shh-1kg',
+    'prod-shahi-mixture',
+    '1kg',
+    1000,
+    560,
+    650,
+    20,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-shh-250g',
+    'prod-shahi-mixture',
+    '250g',
+    250,
+    160,
+    185,
+    50,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-hng-500g',
+    'prod-heeng-sev',
+    '500g',
+    500,
+    160,
+    190,
+    48,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-hng-1kg',
+    'prod-heeng-sev',
+    '1kg',
+    1000,
+    300,
+    360,
+    30,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-hng-250g',
+    'prod-heeng-sev',
+    '250g',
+    250,
+    90,
+    110,
+    65,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-nav-500g',
+    'prod-navratan-mixture',
+    '500g',
+    500,
+    170,
+    200,
+    42,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-nav-1kg',
+    'prod-navratan-mixture',
+    '1kg',
+    1000,
+    320,
+    380,
+    26,
+    NULL,
+    false,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;
+
+INSERT INTO public.product_variants (
+    id, product_id, weight, weight_in_grams, price, mrp, stock, sku, is_default, created_at
+) VALUES (
+    'var-taj-1250g',
+    'prod-taj-heritage-box',
+    '1.25 kg Box',
+    1250,
+    890,
+    1050,
+    25,
+    NULL,
+    true,
+    NOW()
+) ON CONFLICT (id) DO UPDATE SET
+    product_id = EXCLUDED.product_id,
+    weight = EXCLUDED.weight,
+    weight_in_grams = EXCLUDED.weight_in_grams,
+    price = EXCLUDED.price,
+    mrp = EXCLUDED.mrp,
+    stock = EXCLUDED.stock,
+    sku = EXCLUDED.sku,
+    is_default = EXCLUDED.is_default;

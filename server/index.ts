@@ -12,7 +12,7 @@ import reviewsRouter from './routes/reviews.js';
 import settingsRouter from './routes/settings.js';
 import paymentRouter from './routes/payment.js';
 import authRouter from './routes/auth.js';
-import { supabase } from './db.js';
+import { supabase, db } from './db.js';
 
 dotenv.config();
 
@@ -100,6 +100,16 @@ app.get('/api/supabase-status', async (_req, res) => {
     });
   } catch (err: any) {
     res.status(500).json({ connected: false, error: err.message });
+  }
+});
+
+// One-Click Database Migration Endpoint for Supabase
+app.all('/api/migrate-products', async (_req, res) => {
+  try {
+    const result = await db.seedInitialData();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

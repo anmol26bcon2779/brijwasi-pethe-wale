@@ -161,8 +161,15 @@ export const db = {
   // ==========================================
   // SEED INITIAL DATA (Auto-populates empty Supabase)
   // ==========================================
-  seedInitialData: async (): Promise<void> => {
-    if (!supabase) return;
+  seedInitialData: async (): Promise<{ success: boolean; productsMigrated: number; variantsMigrated: number; message?: string }> => {
+    if (!supabase) {
+      return {
+        success: false,
+        productsMigrated: 0,
+        variantsMigrated: 0,
+        message: 'Supabase client is not connected. Please verify environment variables.'
+      };
+    }
     try {
       console.log('[Supabase] Auto-seeding initial store data to Supabase...');
 
@@ -199,8 +206,10 @@ export const db = {
       }
 
       // 3. Seed initial products & variants
+      let prodCount = 0;
+      let varCount = 0;
       for (const prod of INITIAL_PRODUCTS) {
-        await supabase.from('products').upsert({
+        const { error: pErr } = await supabase.from('products').upsert({
           id: prod.id,
           slug: prod.slug,
           name: prod.name,
@@ -222,6 +231,10 @@ export const db = {
           nutritional_info: prod.nutritionalInfo || {}
         }, { onConflict: 'id' });
 
+        if (!pErr) {
+          prodCount++;
+        }
+
         if (prod.variants && prod.variants.length > 0) {
           const variantsToInsert = prod.variants.map(v => ({
             id: v.id,
@@ -234,12 +247,27 @@ export const db = {
             sku: v.sku || null,
             is_default: Boolean(v.isDefault)
           }));
-          await supabase.from('product_variants').upsert(variantsToInsert, { onConflict: 'id' });
+          const { error: vErr } = await supabase.from('product_variants').upsert(variantsToInsert, { onConflict: 'id' });
+          if (!vErr) {
+            varCount += prod.variants.length;
+          }
         }
       }
-      console.log('[Supabase] Initial delicacies and settings successfully seeded to Supabase!');
-    } catch (err) {
+      console.log(`[Supabase] Seeded ${prodCount} products and ${varCount} variants to Supabase!`);
+      return {
+        success: true,
+        productsMigrated: prodCount,
+        variantsMigrated: varCount,
+        message: `Successfully migrated ${prodCount} products and ${varCount} variants into Supabase.`
+      };
+    } catch (err: any) {
       console.error('[Supabase] Error during initial data seed:', err);
+      return {
+        success: false,
+        productsMigrated: 0,
+        variantsMigrated: 0,
+        message: err.message
+      };
     }
   },
 
