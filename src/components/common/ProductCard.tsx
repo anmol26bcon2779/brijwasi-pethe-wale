@@ -30,6 +30,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const discountPercent = Math.round(
     ((selectedVariant.mrp - selectedVariant.price) / selectedVariant.mrp) * 100
   );
+  const primaryImage = (product.images && product.images.length > 0 && product.images[0])
+    ? product.images[0]
+    : '/brijwasi-logo.jpg';
 
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-brand-gold/30 hover:border-brand-gold shadow-card hover:shadow-royal transition-all duration-300 flex flex-col justify-between">
@@ -53,12 +56,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Image container */}
       <Link to={`/product/${product.slug}`} className="block relative aspect-4/3 overflow-hidden bg-brand-cream/40">
         <img
-          src={product.images[0]}
+          src={primaryImage}
           alt={product.name}
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/brijwasi-logo.jpg';
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Gallery count indicator */}
+        {product.images && product.images.length > 1 && (
+          <div className="absolute bottom-2.5 right-2.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-medium px-2 py-0.5 rounded-full shadow-xs opacity-80 group-hover:opacity-100 transition-opacity">
+            {product.images.length} photos
+          </div>
+        )}
       </Link>
 
       {/* Product Information */}

@@ -21,6 +21,7 @@ import { useCart } from '../context/CartContext';
 import { ProductVariant, Review } from '../types';
 import { ProductCard } from '../components/common/ProductCard';
 import { VegBadge, GoldDivider } from '../components/common/MughalArch';
+import { ProductGallery } from '../components/product/ProductGallery';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -135,41 +136,12 @@ export const ProductDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
             {/* Gallery (Left: 6 Cols) */}
-            <div className="lg:col-span-6 space-y-4">
-              <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-brand-cream/30 border border-brand-gold/30 shadow-xs">
-                <img
-                  src={selectedImage}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute top-4 left-4 flex items-center gap-2">
-                  <VegBadge />
-                  {product.isBestseller && (
-                    <span className="bg-brand-magenta text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-xs flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" /> Royal Bestseller
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Thumbnails */}
-              {product.images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {product.images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedImage(img)}
-                      className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
-                        selectedImage === img
-                          ? 'border-brand-magenta shadow-md scale-102'
-                          : 'border-stone-200 opacity-70 hover:opacity-100'
-                      }`}
-                    >
-                      <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div className="lg:col-span-6">
+              <ProductGallery
+                images={product.images}
+                productName={product.name}
+                isBestseller={product.isBestseller}
+              />
             </div>
 
             {/* Info & Purchase Area (Right: 6 Cols) */}

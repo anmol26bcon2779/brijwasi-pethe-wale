@@ -12,6 +12,7 @@ import reviewsRouter from './routes/reviews.js';
 import settingsRouter from './routes/settings.js';
 import paymentRouter from './routes/payment.js';
 import authRouter from './routes/auth.js';
+import uploadRouter from './routes/upload.js';
 import { supabase, db } from './db.js';
 
 dotenv.config();
@@ -28,8 +29,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static assets (like uploaded logo and public files)
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -42,6 +43,7 @@ app.use((req, _res, next) => {
 
 // API Routes
 app.use('/api/products', productsRouter);
+app.use('/api/upload', uploadRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/coupons', couponsRouter);
 app.use('/api/reviews', reviewsRouter);

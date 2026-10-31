@@ -5,12 +5,20 @@ const API_BASE =
   (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '/api' : 'http://localhost:5000/api');
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const adminToken = typeof window !== 'undefined' ? (localStorage.getItem('bpw_admin_token') || 'brijwasi@admin') : '';
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  if (adminToken) {
+    headers['Authorization'] = `Bearer ${adminToken}`;
+  }
+  if (options?.headers) {
+    Object.assign(headers, options.headers);
+  }
+
   const res = await fetch(`${API_BASE}${url}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers
-    },
-    ...options
+    ...options,
+    headers
   });
   const data = await res.json();
   if (!res.ok) {
@@ -39,6 +47,30 @@ export const api = {
   }),
   deleteProduct: (id: string) => fetchJson<{ success: boolean; message: string }>(`/products/${id}`, {
     method: 'DELETE'
+  }),
+  updateProductImages: (id: string, images: string[]) => fetchJson<{ success: boolean; data: Product; message: string }>(`/products/${id}/images`, {
+    method: 'PATCH',
+    body: JSON.stringify({ images })
+  }),
+
+  // Product Image Management & Supabase Storage
+  uploadProductImages: (payload: {
+    files: Array<{ name: string; type: string; base64: string }>;
+    productId?: string;
+    updateProduct?: boolean;
+    replace?: boolean;
+  }) => fetchJson<{
+    success: boolean;
+    message: string;
+    urls: string[];
+    data: Array<{ filename: string; url: string; size: number }>;
+  }>('/upload/product-images', {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }),
+  deleteProductImage: (url: string, productId?: string) => fetchJson<{ success: boolean; message: string }>('/upload/delete-image', {
+    method: 'POST',
+    body: JSON.stringify({ url, productId })
   }),
 
   // Orders

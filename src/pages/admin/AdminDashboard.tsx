@@ -22,6 +22,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
 import { Product, ProductVariant, Order, OrderStatus, Coupon, StoreSettings } from '../../types';
+import { ProductImageManager } from '../../components/admin/ProductImageManager';
 
 export const AdminDashboard: React.FC = () => {
   const { isAdmin, logoutAdmin } = useAuth();
@@ -74,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
   const [pIngredients, setPIngredients] = useState('');
   const [pShelfLife, setPShelfLife] = useState('15 Days');
   const [pStorage, setPStorage] = useState('Store in refrigeration once opened');
-  const [pImages, setPImages] = useState('');
+  const [pImagesList, setPImagesList] = useState<string[]>([]);
   const [pIsBestseller, setPIsBestseller] = useState(false);
   const [pVariants, setPVariants] = useState<ProductVariant[]>([
     { id: 'v1', weight: '500g', weightInGrams: 500, price: 200, mrp: 240, stock: 50, isDefault: true }
@@ -112,7 +113,7 @@ export const AdminDashboard: React.FC = () => {
     setPIngredients('Winter Melon, Sugar, Saffron, Cardamom');
     setPShelfLife('15 Days');
     setPStorage('Refrigerate once opened');
-    setPImages('https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80');
+    setPImagesList(['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80']);
     setPIsBestseller(false);
     setPVariants([
       { id: `var-${Date.now()}-1`, weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 40, isDefault: true }
@@ -130,7 +131,7 @@ export const AdminDashboard: React.FC = () => {
     setPIngredients(prod.ingredients.join(', '));
     setPShelfLife(prod.shelfLife);
     setPStorage(prod.storageInstructions);
-    setPImages(prod.images.join('\n'));
+    setPImagesList(prod.images && prod.images.length > 0 ? [...prod.images] : ['/brijwasi-logo.jpg']);
     setPIsBestseller(Boolean(prod.isBestseller));
     setPVariants([...prod.variants]);
     setIsProductModalOpen(true);
@@ -138,10 +139,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleSaveProduct = (e: React.FormEvent) => {
     e.preventDefault();
-    const imagesList = pImages
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const imagesList = pImagesList.filter(Boolean);
 
     const ingredientList = pIngredients
       .split(',')
@@ -159,7 +157,7 @@ export const AdminDashboard: React.FC = () => {
         ingredients: ingredientList,
         shelfLife: pShelfLife,
         storageInstructions: pStorage,
-        images: imagesList.length > 0 ? imagesList : editingProduct.images,
+        images: imagesList.length > 0 ? imagesList : (editingProduct.images.length > 0 ? editingProduct.images : ['/brijwasi-logo.jpg']),
         isBestseller: pIsBestseller,
         variants: pVariants
       };
@@ -948,13 +946,13 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1">Image URLs (one per line)</label>
-                <textarea
-                  rows={2}
-                  value={pImages}
-                  onChange={(e) => setPImages(e.target.value)}
-                  placeholder="Paste high-res image URLs"
-                  className="w-full p-2.5 bg-stone-50 border rounded-lg"
+                <label className="block font-semibold mb-1 text-sm text-brand-navy">
+                  Product Gallery & Storage Management
+                </label>
+                <ProductImageManager
+                  productId={editingProduct?.id}
+                  images={pImagesList}
+                  onChange={setPImagesList}
                 />
               </div>
 

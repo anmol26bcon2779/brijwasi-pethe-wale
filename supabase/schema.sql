@@ -285,3 +285,41 @@ BEGIN
         CREATE POLICY "Customers can submit reviews" ON public.reviews FOR INSERT WITH CHECK (true);
     END IF;
 END $$;
+
+-- ==============================================================================
+-- 13. SUPABASE STORAGE: 'photos' BUCKET & POLICIES
+-- ==============================================================================
+-- Ensure the storage bucket 'photos' exists and is public for fast image delivery
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'photos',
+    'photos',
+    true,
+    5242880, -- 5 MB
+    ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
+)
+ON CONFLICT (id) DO UPDATE SET
+    public = true,
+    file_size_limit = 5242880;
+
+-- Storage RLS Policies for 'photos' bucket
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Public can view product photos') THEN
+        CREATE POLICY "Public can view product photos"
+        ON storage.objects FOR SELECT
+        USING (bucket_id = 'photos');
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Admins can upload product photos') THEN
+        CREATE POLICY "Admins can upload product photos"
+        ON storage.objects FOR INSERT
+        WITH CHECK (bucket_id = 'photos');
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Admins can delete product photos') THEN
+        CREATE POLICY "Admins can delete product photos"
+        ON storage.objects FOR DELETE
+        USING (bucket_id = 'photos');
+    END IF;
+END $$;

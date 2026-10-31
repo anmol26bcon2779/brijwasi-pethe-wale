@@ -113,6 +113,32 @@ router.put('/:id', async (req: Request, res: Response) => {
   }
 });
 
+// PATCH /api/products/:id/images (Reorder, add, or set primary images)
+router.patch('/:id/images', async (req: Request, res: Response) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { images } = req.body;
+
+    if (!Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ success: false, message: 'Images must be a non-empty array of image URLs' });
+    }
+
+    const existing = await db.getProductBySlugOrId(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const updated = await db.updateProduct({
+      ...existing,
+      images: images.map(img => String(img).trim()).filter(Boolean)
+    });
+
+    res.json({ success: true, message: 'Product images updated successfully', data: updated });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // DELETE /api/products/:id (Admin)
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
