@@ -103,7 +103,9 @@ function formatProduct(row: any, variants: any[] = []): Product {
     tags: Array.isArray(row.tags) ? row.tags : [],
     rating: Number(row.rating || 4.9),
     reviewCount: Number(row.review_count || 0),
-    images: Array.isArray(row.images) ? row.images : [],
+    images: (Array.isArray(row.images) && row.images.length > 0)
+      ? row.images
+      : (row.image_url ? [row.image_url] : (row.image ? [row.image] : [])),
     variants: mappedVariants,
     nutritionalInfo: row.nutritional_info || undefined,
     createdAt: row.created_at || new Date().toISOString(),
