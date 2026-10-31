@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { Filter, SlidersHorizontal, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { ProductCard } from '../components/common/ProductCard';
 import { GoldDivider } from '../components/common/MughalArch';
 
 export const ShopPage: React.FC = () => {
-  const { products } = useStore();
+  const { products, isLoadingProducts, productError, refetchProducts } = useStore();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const categoryParam = searchParams.get('category') || 'all';
@@ -146,17 +146,50 @@ export const ShopPage: React.FC = () => {
           <span>Pan-India Safe Temperature Packaged Dispatches</span>
         </div>
 
-        {/* Product Grid */}
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-stone-200 p-8">
-            <h3 className="font-serif text-lg font-bold text-brand-navy mb-2">No products match your filters</h3>
+        {/* Database Connection Error Notice */}
+        {productError && products.length === 0 && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-red-800">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+              <span>Could not connect to live Supabase database ({productError}). Showing cached delicacies if available.</span>
+            </div>
+            <button
+              onClick={() => refetchProducts()}
+              className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold flex items-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry</span>
+            </button>
+          </div>
+        )}
+
+        {/* Loading Skeleton Grid */}
+        {isLoadingProducts && products.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+              <div key={n} className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-xs animate-pulse">
+                <div className="aspect-square bg-stone-200" />
+                <div className="p-4 space-y-2.5">
+                  <div className="h-4 bg-stone-200 rounded w-3/4" />
+                  <div className="h-3 bg-stone-100 rounded w-1/2" />
+                  <div className="pt-2 flex justify-between items-center">
+                    <div className="h-5 bg-stone-200 rounded w-1/3" />
+                    <div className="h-8 bg-stone-200 rounded w-20" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl border border-stone-200 p-8 shadow-xs">
+            <h3 className="font-serif text-lg font-bold text-brand-navy mb-2">No delicacies match your filter criteria</h3>
             <p className="text-xs text-stone-500 mb-4">Try adjusting your price filter or selecting another category.</p>
             <button
               onClick={() => {
                 setSelectedCategory('all');
                 setPriceRange(1200);
               }}
-              className="bg-brand-navy text-white text-xs px-4 py-2 rounded-lg font-semibold"
+              className="bg-brand-navy hover:bg-brand-magenta text-white text-xs px-5 py-2.5 rounded-xl font-semibold transition-colors cursor-pointer"
             >
               Reset Filters
             </button>

@@ -27,6 +27,11 @@ export interface Product {
   isVegetarian: boolean;
   isBestseller?: boolean;
   isFeatured?: boolean;
+  isPublished?: boolean;
+  isAvailable?: boolean;
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
   rating: number;
   reviewCount: number;
   images: string[];

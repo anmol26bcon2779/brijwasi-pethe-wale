@@ -32,7 +32,7 @@ export const api = {
   checkHealth: () => fetchJson<{ status: string }>('/health'),
 
   // Products
-  getProducts: (params?: { category?: string; search?: string; sort?: string }) => {
+  getProducts: (params?: { category?: string; search?: string; sort?: string; includeDrafts?: boolean }) => {
     const query = new URLSearchParams(params as any).toString();
     return fetchJson<{ success: boolean; data: Product[] }>(`/products${query ? `?${query}` : ''}`);
   },
@@ -47,6 +47,10 @@ export const api = {
   }),
   deleteProduct: (id: string) => fetchJson<{ success: boolean; message: string }>(`/products/${id}`, {
     method: 'DELETE'
+  }),
+  togglePublishProduct: (id: string, isPublished?: boolean) => fetchJson<{ success: boolean; data: Product; message: string }>(`/products/${id}/publish`, {
+    method: 'PATCH',
+    body: JSON.stringify({ isPublished })
   }),
   updateProductImages: (id: string, images: string[]) => fetchJson<{ success: boolean; data: Product; message: string }>(`/products/${id}/images`, {
     method: 'PATCH',

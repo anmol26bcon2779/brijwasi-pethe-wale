@@ -7,8 +7,13 @@ const router = Router();
 // GET /api/products
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { category, search, bestseller, sort } = req.query;
+    const { category, search, bestseller, sort, includeDrafts } = req.query;
     let list = await db.getProducts();
+
+    // Unless includeDrafts=true (admin mode), only show published products to patrons
+    if (includeDrafts !== 'true') {
+      list = list.filter(p => p.isPublished !== false);
+    }
 
     if (category && category !== 'all') {
       list = list.filter(p => p.category === category);
@@ -134,6 +139,34 @@ router.patch('/:id/images', async (req: Request, res: Response) => {
     });
 
     res.json({ success: true, message: 'Product images updated successfully', data: updated });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// PATCH /api/products/:id/publish (Toggle or set product publication status)
+router.patch('/:id/publish', async (req: Request, res: Response) => {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const existing = await db.getProductBySlugOrId(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const isPublished = req.body.isPublished !== undefined
+      ? Boolean(req.body.isPublished)
+      : !existing.isPublished;
+
+    const updated = await db.updateProduct({
+      ...existing,
+      isPublished
+    });
+
+    res.json({
+      success: true,
+      message: `Product '${updated.name}' is now ${isPublished ? 'Published' : 'Unpublished (Draft)'}`,
+      data: updated
+    });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

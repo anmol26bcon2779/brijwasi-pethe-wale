@@ -17,9 +17,14 @@ import { api } from '../lib/api';
 
 interface StoreContextType {
   products: Product[];
-  addProduct: (product: Product) => void;
-  updateProduct: (product: Product) => void;
-  deleteProduct: (productId: string) => void;
+  allProducts: Product[];
+  isLoadingProducts: boolean;
+  productError: string | null;
+  refetchProducts: () => Promise<void>;
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (product: Product) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  togglePublishProduct: (productId: string, isPublished?: boolean) => Promise<void>;
   getProductBySlug: (slug: string) => Product | undefined;
   
   orders: Order[];
@@ -51,7 +56,10 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const products = React.useMemo(() => allProducts.filter((p) => p.isPublished !== false), [allProducts]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
+  const [productError, setProductError] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [settings, setSettings] = useState<StoreSettings>(getStoredSettings());
@@ -60,6 +68,23 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const refetchProducts = async () => {
+    setIsLoadingProducts(true);
+    setProductError(null);
+    try {
+      const res = await api.getProducts({ includeDrafts: true });
+      if (res.success && Array.isArray(res.data)) {
+        setAllProducts(res.data);
+        saveStoredProducts(res.data);
+      }
+    } catch (err: any) {
+      console.warn('Error fetching products from Supabase API:', err);
+      setProductError(err.message || 'Could not connect to database');
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  };
 
   // Initialize from storage & sync with backend API if online
   useEffect(() => {
@@ -70,27 +95,24 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const initialSettings = getStoredSettings();
     const initialReviews = getStoredReviews();
 
-    setProducts(initialProducts);
+    setAllProducts(initialProducts);
     setOrders(initialOrders);
     setCoupons(initialCoupons);
     setSettings(initialSettings);
     setReviews(initialReviews);
 
-    // 2. Async backend sync
-    const syncWithBackend = async () => {
+    // 2. Async backend sync with live Supabase
+    refetchProducts();
+
+    const syncOtherData = async () => {
       try {
-        const [prodRes, ordRes, coupRes, settRes, revRes] = await Promise.allSettled([
-          api.getProducts(),
+        const [ordRes, coupRes, settRes, revRes] = await Promise.allSettled([
           api.getOrders(),
           api.getCoupons(),
           api.getSettings(),
           api.getReviews()
         ]);
 
-        if (prodRes.status === 'fulfilled' && prodRes.value.data?.length) {
-          setProducts(prodRes.value.data);
-          saveStoredProducts(prodRes.value.data);
-        }
         if (ordRes.status === 'fulfilled' && ordRes.value.data?.length) {
           setOrders(ordRes.value.data);
           saveStoredOrders(ordRes.value.data);
@@ -112,30 +134,61 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    syncWithBackend();
+    syncOtherData();
   }, []);
 
-  // Products
-  const addProduct = (product: Product) => {
-    const updated = [product, ...products];
-    setProducts(updated);
+  // Products CRUD with Supabase API integration
+  const addProduct = async (product: Product) => {
+    const updated = [product, ...allProducts];
+    setAllProducts(updated);
     saveStoredProducts(updated);
+    try {
+      await api.createProduct(product);
+      await refetchProducts();
+    } catch (err) {
+      console.error('Failed to create product in Supabase:', err);
+    }
   };
 
-  const updateProduct = (product: Product) => {
-    const updated = products.map((p) => (p.id === product.id ? product : p));
-    setProducts(updated);
+  const updateProduct = async (product: Product) => {
+    const updated = allProducts.map((p) => (p.id === product.id ? product : p));
+    setAllProducts(updated);
     saveStoredProducts(updated);
+    try {
+      await api.updateProduct(product.id, product);
+      await refetchProducts();
+    } catch (err) {
+      console.error('Failed to update product in Supabase:', err);
+    }
   };
 
-  const deleteProduct = (productId: string) => {
-    const updated = products.filter((p) => p.id !== productId);
-    setProducts(updated);
+  const deleteProduct = async (productId: string) => {
+    const updated = allProducts.filter((p) => p.id !== productId);
+    setAllProducts(updated);
     saveStoredProducts(updated);
+    try {
+      await api.deleteProduct(productId);
+      await refetchProducts();
+    } catch (err) {
+      console.error('Failed to delete product in Supabase:', err);
+    }
+  };
+
+  const togglePublishProduct = async (productId: string, isPublished?: boolean) => {
+    try {
+      const res = await api.togglePublishProduct(productId, isPublished);
+      if (res.success && res.data) {
+        const updated = allProducts.map((p) => (p.id === productId ? res.data : p));
+        setAllProducts(updated);
+        saveStoredProducts(updated);
+      }
+    } catch (err) {
+      console.error('Failed to toggle publication status:', err);
+    }
   };
 
   const getProductBySlug = (slug: string) => {
-    return products.find((p) => p.slug === slug || p.id === slug);
+    return allProducts.find((p) => p.slug === slug || p.id === slug);
   };
 
   // Orders
@@ -279,9 +332,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     <StoreContext.Provider
       value={{
         products,
+        allProducts,
+        isLoadingProducts,
+        productError,
+        refetchProducts,
         addProduct,
         updateProduct,
         deleteProduct,
+        togglePublishProduct,
         getProductBySlug,
         orders,
         addOrder,

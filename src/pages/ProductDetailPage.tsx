@@ -14,8 +14,10 @@ import {
   Calendar, 
   Box, 
   ArrowLeft,
-  MessageSquare
+  MessageSquare,
+  AlertTriangle
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { useCart } from '../context/CartContext';
 import { ProductVariant, Review } from '../types';
@@ -26,7 +28,8 @@ import { ProductGallery } from '../components/product/ProductGallery';
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { products, getProductBySlug, getProductReviews, addReview, setIsCartOpen } = useStore();
+  const { isAdmin } = useAuth();
+  const { products, getProductBySlug, getProductReviews, addReview, setIsCartOpen, togglePublishProduct } = useStore();
   const { addToCart } = useCart();
 
   const product = getProductBySlug(slug || '');
@@ -64,6 +67,22 @@ export const ProductDetailPage: React.FC = () => {
           className="bg-brand-navy text-white text-xs font-semibold px-6 py-2.5 rounded-full"
         >
           Return to Shop
+        </Link>
+      </div>
+    );
+  }
+
+  // Non-admins cannot see draft products
+  if (product.isPublished === false && !isAdmin) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center bg-brand-ivory">
+        <h2 className="font-serif text-2xl font-bold text-brand-navy mb-2">Delicacy In Kitchen Preparation</h2>
+        <p className="text-sm text-stone-500 mb-6">This traditional recipe is currently being handcrafted in our kitchens and will be available soon.</p>
+        <Link
+          to="/shop"
+          className="bg-brand-navy hover:bg-brand-magenta text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-colors"
+        >
+          Explore Available Agra Delicacies
         </Link>
       </div>
     );
@@ -118,6 +137,25 @@ export const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-ivory py-8 sm:py-12 animate-fadeIn">
+      {/* Admin Draft Banner */}
+      {product.isPublished === false && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <div className="bg-amber-400 text-stone-900 px-4 py-2.5 rounded-2xl text-xs font-semibold flex flex-wrap items-center justify-between gap-2 shadow-xs border border-amber-500">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-stone-950 shrink-0" />
+              <span>
+                <strong>Admin Live Preview Mode:</strong> This delicacy is saved as a <strong>Draft</strong> and is hidden from customers.
+              </span>
+            </div>
+            <button
+              onClick={() => togglePublishProduct(product.id, true)}
+              className="bg-brand-navy hover:bg-stone-900 text-white px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+            >
+              Publish Delicacy Now 🟢
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb */}

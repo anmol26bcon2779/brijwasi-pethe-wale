@@ -17,20 +17,30 @@ import {
   AlertTriangle, 
   ExternalLink,
   ShieldAlert,
-  Search
+  Search,
+  Eye,
+  Sparkles,
+  Image as ImageIcon,
+  Sliders,
+  CheckCircle2,
+  Clock,
+  Layers
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
 import { Product, ProductVariant, Order, OrderStatus, Coupon, StoreSettings } from '../../types';
 import { ProductImageManager } from '../../components/admin/ProductImageManager';
+import { ProductCard } from '../../components/common/ProductCard';
 
 export const AdminDashboard: React.FC = () => {
   const { isAdmin, logoutAdmin } = useAuth();
   const { 
-    products, 
+    products,
+    allProducts,
     addProduct, 
     updateProduct, 
-    deleteProduct, 
+    deleteProduct,
+    togglePublishProduct,
     orders, 
     updateOrderStatus,
     coupons,
@@ -48,6 +58,13 @@ export const AdminDashboard: React.FC = () => {
   // Product Modals
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [productModalTab, setProductModalTab] = useState<'details' | 'images' | 'variants' | 'specs' | 'preview'>('details');
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+
+  // Catalog Table Filters
+  const [productSearchTerm, setProductSearchTerm] = useState('');
+  const [productCategoryFilter, setProductCategoryFilter] = useState<'all' | 'petha' | 'namkeen' | 'gift-boxes'>('all');
+  const [productStatusFilter, setProductStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
 
   // Order Details Modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -69,14 +86,24 @@ export const AdminDashboard: React.FC = () => {
   // Product Form State
   const [pName, setPName] = useState('');
   const [pHindiName, setPHindiName] = useState('');
+  const [pSlug, setPSlug] = useState('');
   const [pCategory, setPCategory] = useState<'petha' | 'namkeen' | 'gift-boxes'>('petha');
+  const [pSubCategory, setPSubCategory] = useState('');
   const [pShortDesc, setPShortDesc] = useState('');
   const [pDesc, setPDesc] = useState('');
   const [pIngredients, setPIngredients] = useState('');
   const [pShelfLife, setPShelfLife] = useState('15 Days');
   const [pStorage, setPStorage] = useState('Store in refrigeration once opened');
+  const [pAllergenInfo, setPAllergenInfo] = useState('');
+  const [pCalories, setPCalories] = useState('320 kcal');
+  const [pCarbs, setPCarbs] = useState('78g');
+  const [pProtein, setPProtein] = useState('0.8g');
+  const [pFat, setPFat] = useState('0g');
+  const [pTags, setPTags] = useState('');
   const [pImagesList, setPImagesList] = useState<string[]>([]);
   const [pIsBestseller, setPIsBestseller] = useState(false);
+  const [pIsPublished, setPIsPublished] = useState(true);
+  const [pIsAvailable, setPIsAvailable] = useState(true);
   const [pVariants, setPVariants] = useState<ProductVariant[]>([
     { id: 'v1', weight: '500g', weightInGrams: 500, price: 200, mrp: 240, stock: 50, isDefault: true }
   ]);
@@ -101,23 +128,36 @@ export const AdminDashboard: React.FC = () => {
   const totalRevenue = orders.reduce((sum, ord) => sum + (ord.status !== 'Cancelled' ? ord.total : 0), 0);
   const totalOrdersCount = orders.length;
   const pendingOrdersCount = orders.filter((o) => ['Pending', 'Confirmed', 'Processing'].includes(o.status)).length;
-  const lowStockCount = products.filter((p) => p.variants.some((v) => v.stock <= 10)).length;
+  const catalogList = allProducts?.length ? allProducts : products;
+  const lowStockCount = catalogList.filter((p) => p.variants.some((v) => v.stock <= 10)).length;
 
   const handleOpenAddProduct = () => {
     setEditingProduct(null);
     setPName('');
     setPHindiName('');
+    setPSlug('');
     setPCategory('petha');
+    setPSubCategory('');
     setPShortDesc('');
     setPDesc('');
-    setPIngredients('Winter Melon, Sugar, Saffron, Cardamom');
+    setPIngredients('Winter Melon (Ash Gourd), Sugar, Kashmiri Saffron, Cardamom, Kewra Essence');
     setPShelfLife('15 Days');
-    setPStorage('Refrigerate once opened');
+    setPStorage('Refrigerate once opened. Store in a cool, dry place.');
+    setPAllergenInfo('Contains no artificial preservatives. Handcrafted in a facility that also processes nuts.');
+    setPCalories('310 kcal');
+    setPCarbs('76g');
+    setPProtein('0.8g');
+    setPFat('0g');
+    setPTags('agra-special, royal, kesar, handcrafted, best-seller');
     setPImagesList(['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80']);
     setPIsBestseller(false);
+    setPIsPublished(true);
+    setPIsAvailable(true);
     setPVariants([
-      { id: `var-${Date.now()}-1`, weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 40, isDefault: true }
+      { id: `var-${Date.now()}-1`, weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 40, isDefault: true },
+      { id: `var-${Date.now()}-2`, weight: '1kg', weightInGrams: 1000, price: 420, mrp: 500, stock: 30, isDefault: false }
     ]);
+    setProductModalTab('details');
     setIsProductModalOpen(true);
   };
 
@@ -125,66 +165,129 @@ export const AdminDashboard: React.FC = () => {
     setEditingProduct(prod);
     setPName(prod.name);
     setPHindiName(prod.hindiName || '');
+    setPSlug(prod.slug || '');
     setPCategory(prod.category);
-    setPShortDesc(prod.shortDescription);
-    setPDesc(prod.description);
-    setPIngredients(prod.ingredients.join(', '));
-    setPShelfLife(prod.shelfLife);
-    setPStorage(prod.storageInstructions);
+    setPSubCategory(prod.subCategory || '');
+    setPShortDesc(prod.shortDescription || '');
+    setPDesc(prod.description || '');
+    setPIngredients(Array.isArray(prod.ingredients) ? prod.ingredients.join(', ') : '');
+    setPShelfLife(prod.shelfLife || '15 Days');
+    setPStorage(prod.storageInstructions || 'Store in refrigeration once opened');
+    setPAllergenInfo(prod.allergenInfo || '');
+    setPCalories(prod.nutritionalInfo?.calories || '310 kcal');
+    setPCarbs(prod.nutritionalInfo?.carbohydrates || '76g');
+    setPProtein(prod.nutritionalInfo?.protein || '0.8g');
+    setPFat(prod.nutritionalInfo?.fat || '0g');
+    setPTags(Array.isArray(prod.tags) ? prod.tags.join(', ') : '');
     setPImagesList(prod.images && prod.images.length > 0 ? [...prod.images] : ['/brijwasi-logo.jpg']);
     setPIsBestseller(Boolean(prod.isBestseller));
-    setPVariants([...prod.variants]);
+    setPIsPublished(prod.isPublished !== false);
+    setPIsAvailable(prod.isAvailable !== false);
+    setPVariants(prod.variants && prod.variants.length > 0 ? prod.variants.map(v => ({ ...v })) : [
+      { id: `var-${Date.now()}-1`, weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 40, isDefault: true }
+    ]);
+    setProductModalTab('details');
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleAddVariant = () => {
+    const newV: ProductVariant = {
+      id: `var-${Date.now()}-${pVariants.length + 1}`,
+      weight: '1kg',
+      weightInGrams: 1000,
+      price: 350,
+      mrp: 420,
+      stock: 30,
+      isDefault: pVariants.length === 0
+    };
+    setPVariants([...pVariants, newV]);
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    if (pVariants.length <= 1) {
+      alert('At least one weight variant is required.');
+      return;
+    }
+    const updated = pVariants.filter((_, i) => i !== index);
+    if (!updated.some(v => v.isDefault)) {
+      updated[0].isDefault = true;
+    }
+    setPVariants(updated);
+  };
+
+  const handleSetDefaultVariant = (index: number) => {
+    const updated = pVariants.map((v, i) => ({
+      ...v,
+      isDefault: i === index
+    }));
+    setPVariants(updated);
+  };
+
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    const imagesList = pImagesList.filter(Boolean);
+    if (!pName.trim()) {
+      alert('Product name is required');
+      return;
+    }
 
-    const ingredientList = pIngredients
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    setIsSavingProduct(true);
+    try {
+      const imagesList = pImagesList.filter(Boolean);
+      const ingredientList = pIngredients
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const tagList = pTags
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
 
-    if (editingProduct) {
-      const updated: Product = {
-        ...editingProduct,
-        name: pName,
-        hindiName: pHindiName,
+      const generatedSlug = (pSlug.trim() || pName)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+
+      const payload: Product = {
+        id: editingProduct ? editingProduct.id : `prod-${Date.now()}`,
+        slug: generatedSlug,
+        name: pName.trim(),
+        hindiName: pHindiName.trim() || undefined,
         category: pCategory,
-        shortDescription: pShortDesc,
-        description: pDesc,
-        ingredients: ingredientList,
-        shelfLife: pShelfLife,
-        storageInstructions: pStorage,
-        images: imagesList.length > 0 ? imagesList : (editingProduct.images.length > 0 ? editingProduct.images : ['/brijwasi-logo.jpg']),
-        isBestseller: pIsBestseller,
-        variants: pVariants
-      };
-      updateProduct(updated);
-    } else {
-      const newSlug = pName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const created: Product = {
-        id: `prod-${Date.now()}`,
-        slug: newSlug,
-        name: pName,
-        hindiName: pHindiName,
-        category: pCategory,
-        shortDescription: pShortDesc,
-        description: pDesc,
-        ingredients: ingredientList,
-        shelfLife: pShelfLife,
-        storageInstructions: pStorage,
-        images: imagesList.length > 0 ? imagesList : ['https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=800&q=80'],
+        subCategory: pSubCategory.trim() || undefined,
+        shortDescription: pShortDesc.trim() || `${pName} freshly prepared in Agra.`,
+        description: pDesc.trim() || `${pName} is an iconic delicacy prepared by Master Halwais of Brijwasi Pethe Wale.`,
+        ingredients: ingredientList.length > 0 ? ingredientList : ['Ash Gourd', 'Sugar', 'Saffron'],
+        shelfLife: pShelfLife.trim() || '15 Days',
+        storageInstructions: pStorage.trim() || 'Store in refrigeration once opened',
+        allergenInfo: pAllergenInfo.trim() || undefined,
+        nutritionalInfo: {
+          calories: pCalories.trim() || undefined,
+          carbohydrates: pCarbs.trim() || undefined,
+          protein: pProtein.trim() || undefined,
+          fat: pFat.trim() || undefined,
+        },
+        tags: tagList,
+        images: imagesList.length > 0 ? imagesList : (editingProduct?.images?.length ? editingProduct.images : ['/brijwasi-logo.jpg']),
         isVegetarian: true,
         isBestseller: pIsBestseller,
-        rating: 5.0,
-        reviewCount: 1,
+        isPublished: pIsPublished,
+        isAvailable: pIsAvailable,
+        rating: editingProduct ? editingProduct.rating : 5.0,
+        reviewCount: editingProduct ? editingProduct.reviewCount : 1,
         variants: pVariants
       };
-      addProduct(created);
+
+      if (editingProduct) {
+        await updateProduct(payload);
+      } else {
+        await addProduct(payload);
+      }
+      setIsProductModalOpen(false);
+    } catch (err: any) {
+      alert(`Error saving product: ${err?.message || err}`);
+    } finally {
+      setIsSavingProduct(false);
     }
-    setIsProductModalOpen(false);
   };
 
   const handleUpdateOrderStatusSubmit = (e: React.FormEvent) => {
@@ -437,16 +540,68 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-serif text-xl font-bold text-brand-navy">Product Catalog</h2>
-                  <p className="text-xs text-stone-500">Add, edit, manage weight variants, prices and stock inventory.</p>
+                  <h2 className="font-serif text-xl font-bold text-brand-navy">Supabase Product Catalog</h2>
+                  <p className="text-xs text-stone-500">Live single source of truth for products, images, weight variants, prices and stock inventory.</p>
                 </div>
                 <button
                   onClick={handleOpenAddProduct}
-                  className="bg-brand-magenta hover:bg-brand-magenta-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-royal flex items-center gap-1.5 transition-all self-start sm:self-auto"
+                  className="bg-brand-magenta hover:bg-brand-magenta-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-royal flex items-center gap-1.5 transition-all self-start sm:self-auto cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Add New Product</span>
+                  <span>Add New Delicacy</span>
                 </button>
+              </div>
+
+              {/* Filter Controls Bar */}
+              <div className="bg-white p-3.5 rounded-2xl border border-stone-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+                {/* Search */}
+                <div className="relative flex-1 min-w-[220px]">
+                  <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder="Search by delicacy name, slug or tag..."
+                    value={productSearchTerm}
+                    onChange={(e) => setProductSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-brand-magenta"
+                  />
+                  {productSearchTerm && (
+                    <button
+                      onClick={() => setProductSearchTerm('')}
+                      className="absolute right-2.5 top-2.5 text-stone-400 hover:text-stone-600"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-stone-500 font-medium">Category:</span>
+                  <select
+                    value={productCategoryFilter}
+                    onChange={(e) => setProductCategoryFilter(e.target.value as any)}
+                    className="bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-magenta"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="petha">Agra Petha</option>
+                    <option value="namkeen">Agra Namkeen</option>
+                    <option value="gift-boxes">Royal Gift Boxes</option>
+                  </select>
+                </div>
+
+                {/* Status Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-stone-500 font-medium">Status:</span>
+                  <select
+                    value={productStatusFilter}
+                    onChange={(e) => setProductStatusFilter(e.target.value as any)}
+                    className="bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-magenta"
+                  >
+                    <option value="all">All Products</option>
+                    <option value="published">Published Only</option>
+                    <option value="draft">Drafts Only</option>
+                  </select>
+                </div>
               </div>
 
               {/* Products Table */}
@@ -455,8 +610,9 @@ export const AdminDashboard: React.FC = () => {
                   <table className="w-full text-xs text-left">
                     <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider font-semibold border-b">
                       <tr>
-                        <th className="p-3">Delicacy</th>
+                        <th className="p-3">Delicacy & Slug</th>
                         <th className="p-3">Category</th>
+                        <th className="p-3">Storefront Status</th>
                         <th className="p-3">Variants & Prices</th>
                         <th className="p-3">Stock</th>
                         <th className="p-3">Rating</th>
@@ -464,68 +620,131 @@ export const AdminDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100">
-                      {products.map((p) => {
-                        const totalStock = p.variants.reduce((acc, v) => acc + v.stock, 0);
-                        return (
-                          <tr key={p.id} className="hover:bg-stone-50">
-                            <td className="p-3">
-                              <div className="flex items-center gap-3">
-                                <img
-                                  src={p.images[0]}
-                                  alt={p.name}
-                                  className="w-10 h-10 rounded-lg object-cover border border-stone-200 shrink-0"
-                                />
-                                <div>
-                                  <p className="font-bold text-brand-navy">{p.name}</p>
-                                  {p.hindiName && <span className="text-[10px] text-brand-gold-dark">{p.hindiName}</span>}
+                      {catalogList
+                        .filter((p) => {
+                          if (productCategoryFilter !== 'all' && p.category !== productCategoryFilter) {
+                            return false;
+                          }
+                          if (productStatusFilter === 'published' && p.isPublished === false) {
+                            return false;
+                          }
+                          if (productStatusFilter === 'draft' && p.isPublished !== false) {
+                            return false;
+                          }
+                          if (productSearchTerm.trim()) {
+                            const q = productSearchTerm.toLowerCase();
+                            const matchName = p.name.toLowerCase().includes(q);
+                            const matchHindi = p.hindiName?.toLowerCase().includes(q);
+                            const matchSlug = p.slug?.toLowerCase().includes(q);
+                            const matchTag = p.tags?.some((t) => t.toLowerCase().includes(q));
+                            if (!matchName && !matchHindi && !matchSlug && !matchTag) return false;
+                          }
+                          return true;
+                        })
+                        .map((p) => {
+                          const totalStock = p.variants?.reduce((acc, v) => acc + (v.stock || 0), 0) ?? 0;
+                          const isPublished = p.isPublished !== false;
+                          return (
+                            <tr key={p.id} className="hover:bg-stone-50 transition-colors">
+                              <td className="p-3">
+                                <div className="flex items-center gap-3">
+                                  <img
+                                    src={p.images?.[0] || '/brijwasi-logo.jpg'}
+                                    alt={p.name}
+                                    className="w-11 h-11 rounded-lg object-cover border border-stone-200 shrink-0 bg-stone-100"
+                                  />
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <p className="font-bold text-brand-navy">{p.name}</p>
+                                      {p.isBestseller && (
+                                        <span className="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded-full border border-amber-300">
+                                          Bestseller
+                                        </span>
+                                      )}
+                                    </div>
+                                    {p.hindiName && <span className="text-[10px] text-brand-gold-dark block">{p.hindiName}</span>}
+                                    <span className="text-[10px] text-stone-400 font-mono">/{p.slug}</span>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="p-3 uppercase text-[10px] font-bold text-stone-600">
-                              {p.category}
-                            </td>
-                            <td className="p-3">
-                              <div className="space-y-0.5">
-                                {p.variants.map((v) => (
-                                  <span key={v.id} className="inline-block mr-2 text-[11px] bg-stone-100 px-1.5 py-0.5 rounded text-stone-700">
-                                    {v.weight}: <strong>₹{v.price}</strong>
+                              </td>
+                              <td className="p-3">
+                                <span className="uppercase text-[10px] font-bold text-stone-700 bg-stone-100 px-2 py-0.5 rounded">
+                                  {p.category}
+                                </span>
+                                {p.subCategory && (
+                                  <span className="block text-[10px] text-stone-400 mt-0.5">
+                                    {p.subCategory}
                                   </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              <span className={`font-semibold px-2 py-0.5 rounded text-[10px] ${
-                                totalStock > 10 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700 font-bold'
-                              }`}>
-                                {totalStock} total packs
-                              </span>
-                            </td>
-                            <td className="p-3 text-stone-700 font-semibold">
-                              ★ {p.rating} ({p.reviewCount})
-                            </td>
-                            <td className="p-3 text-right space-x-1">
-                              <button
-                                onClick={() => handleOpenEditProduct(p)}
-                                className="p-1.5 text-stone-600 hover:text-brand-magenta hover:bg-stone-100 rounded-lg transition-colors"
-                                title="Edit Product"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (confirm(`Are you sure you want to delete ${p.name}?`)) {
-                                    deleteProduct(p.id);
-                                  }
-                                }}
-                                className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-stone-100 rounded-lg transition-colors"
-                                title="Delete Product"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <button
+                                  type="button"
+                                  onClick={() => togglePublishProduct(p.id, !isPublished)}
+                                  title={isPublished ? "Click to set as Draft (hide from storefront)" : "Click to publish live"}
+                                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer ${
+                                    isPublished
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                      : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isPublished ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+                                  <span>{isPublished ? 'Published 🟢' : 'Draft 🟡'}</span>
+                                </button>
+                                {p.isAvailable === false && (
+                                  <span className="block mt-1 text-[9px] text-red-600 font-semibold">Unavailable</span>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <div className="space-y-0.5">
+                                  {p.variants?.map((v) => (
+                                    <span key={v.id} className="inline-block mr-2 text-[11px] bg-stone-100 px-1.5 py-0.5 rounded text-stone-700">
+                                      {v.weight}: <strong>₹{v.price}</strong>
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <span className={`font-semibold px-2 py-0.5 rounded text-[10px] ${
+                                  totalStock > 10 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700 font-bold'
+                                }`}>
+                                  {totalStock} total packs
+                                </span>
+                              </td>
+                              <td className="p-3 text-stone-700 font-semibold">
+                                ★ {p.rating} ({p.reviewCount})
+                              </td>
+                              <td className="p-3 text-right space-x-1">
+                                <Link
+                                  to={`/product/${p.slug}`}
+                                  target="_blank"
+                                  className="p-1.5 text-stone-500 hover:text-brand-navy hover:bg-stone-100 rounded-lg transition-colors inline-block"
+                                  title="Live Storefront Preview"
+                                >
+                                  <ExternalLink className="w-4 h-4" />
+                                </Link>
+                                <button
+                                  onClick={() => handleOpenEditProduct(p)}
+                                  className="p-1.5 text-stone-600 hover:text-brand-magenta hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+                                  title="Edit Delicacy"
+                                >
+                                  <Edit3 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (confirm(`Are you sure you want to permanently delete "${p.name}"?`)) {
+                                      deleteProduct(p.id);
+                                    }
+                                  }}
+                                  className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete Delicacy"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -838,198 +1057,610 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Product Add/Edit Modal */}
-      {isProductModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b">
-              <h3 className="font-serif text-lg font-bold text-brand-navy">
-                {editingProduct ? 'Edit Agra Delicacy' : 'Add New Agra Delicacy'}
-              </h3>
-              <button onClick={() => setIsProductModalOpen(false)} className="p-1 text-stone-400 hover:text-stone-700">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {isProductModalOpen && (() => {
+        const previewCleanSlug = (pSlug.trim() || pName)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
 
-            <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+        const previewProduct: Product = {
+          id: editingProduct?.id || 'preview-temp-id',
+          slug: previewCleanSlug || 'delicacy-slug',
+          name: pName || 'Product Title Preview',
+          hindiName: pHindiName || undefined,
+          category: pCategory,
+          subCategory: pSubCategory || undefined,
+          shortDescription: pShortDesc || 'A short description of this authentic delicacy.',
+          description: pDesc || 'Full detailed description...',
+          ingredients: pIngredients.split(',').map(s => s.trim()).filter(Boolean),
+          shelfLife: pShelfLife,
+          storageInstructions: pStorage,
+          tags: pTags.split(',').map(s => s.trim()).filter(Boolean),
+          images: pImagesList.filter(Boolean).length > 0 ? pImagesList.filter(Boolean) : ['/brijwasi-logo.jpg'],
+          isVegetarian: true,
+          isBestseller: pIsBestseller,
+          isPublished: pIsPublished,
+          isAvailable: pIsAvailable,
+          nutritionalInfo: {
+            calories: pCalories,
+            carbohydrates: pCarbs,
+            protein: pProtein,
+            fat: pFat,
+          },
+          rating: editingProduct?.rating || 5.0,
+          reviewCount: editingProduct?.reviewCount || 1,
+          variants: pVariants.length > 0 ? pVariants : [
+            { id: 'v1', weight: '500g', weightInGrams: 500, price: 220, mrp: 260, stock: 40, isDefault: true }
+          ]
+        };
+
+        return (
+          <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 flex items-center justify-center bg-black/60 backdrop-blur-xs">
+            <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-4 max-h-[92vh] overflow-y-auto shadow-2xl">
+              
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-3 border-b">
                 <div>
-                  <label className="block font-semibold mb-1">Product Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={pName}
-                    onChange={(e) => setPName(e.target.value)}
-                    placeholder="e.g. Saffron Angoori Petha"
-                    className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                  />
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-brand-navy">
+                    {editingProduct ? `Edit Delicacy: ${editingProduct.name}` : 'Add New Agra Delicacy'}
+                  </h3>
+                  <span className="text-[11px] text-stone-500">
+                    Direct Supabase Management • Changes sync live across the storefront
+                  </span>
                 </div>
-                <div>
-                  <label className="block font-semibold mb-1">Hindi Name</label>
-                  <input
-                    type="text"
-                    value={pHindiName}
-                    onChange={(e) => setPHindiName(e.target.value)}
-                    placeholder="e.g. केसर अंगूरी पेठा"
-                    className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold mb-1">Category *</label>
-                  <select
-                    value={pCategory}
-                    onChange={(e) => setPCategory(e.target.value as any)}
-                    className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                  >
-                    <option value="petha">Agra Petha</option>
-                    <option value="namkeen">Agra Namkeen</option>
-                    <option value="gift-boxes">Royal Gift Boxes</option>
-                  </select>
-                </div>
-                <div className="flex items-center pt-5">
-                  <label className="flex items-center gap-2 cursor-pointer font-semibold text-stone-800">
-                    <input
-                      type="checkbox"
-                      checked={pIsBestseller}
-                      onChange={(e) => setPIsBestseller(e.target.checked)}
-                      className="accent-brand-magenta"
-                    />
-                    <span>Mark as Royal Bestseller</span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1">Short Description *</label>
-                <input
-                  type="text"
-                  required
-                  value={pShortDesc}
-                  onChange={(e) => setPShortDesc(e.target.value)}
-                  placeholder="One sentence summary"
-                  className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1">Detailed Description *</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={pDesc}
-                  onChange={(e) => setPDesc(e.target.value)}
-                  className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold mb-1">Ingredients (comma separated)</label>
-                  <input
-                    type="text"
-                    value={pIngredients}
-                    onChange={(e) => setPIngredients(e.target.value)}
-                    className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">Shelf Life</label>
-                  <input
-                    type="text"
-                    value={pShelfLife}
-                    onChange={(e) => setPShelfLife(e.target.value)}
-                    className="w-full p-2.5 bg-stone-50 border rounded-lg"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-semibold mb-1 text-sm text-brand-navy">
-                  Product Gallery & Storage Management
-                </label>
-                <ProductImageManager
-                  productId={editingProduct?.id}
-                  images={pImagesList}
-                  onChange={setPImagesList}
-                />
-              </div>
-
-              {/* Variants Section */}
-              <div className="p-3 bg-stone-50 rounded-xl border border-stone-200">
-                <span className="font-bold text-stone-800 block mb-2">Weight Variants & Pricing</span>
-                <div className="space-y-2">
-                  {pVariants.map((v, i) => (
-                    <div key={v.id} className="grid grid-cols-4 gap-2">
-                      <input
-                        type="text"
-                        placeholder="Weight (e.g. 500g)"
-                        value={v.weight}
-                        onChange={(e) => {
-                          const updated = [...pVariants];
-                          updated[i].weight = e.target.value;
-                          setPVariants(updated);
-                        }}
-                        className="p-2 bg-white border rounded"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Price (₹)"
-                        value={v.price}
-                        onChange={(e) => {
-                          const updated = [...pVariants];
-                          updated[i].price = Number(e.target.value);
-                          setPVariants(updated);
-                        }}
-                        className="p-2 bg-white border rounded"
-                      />
-                      <input
-                        type="number"
-                        placeholder="MRP (₹)"
-                        value={v.mrp}
-                        onChange={(e) => {
-                          const updated = [...pVariants];
-                          updated[i].mrp = Number(e.target.value);
-                          setPVariants(updated);
-                        }}
-                        className="p-2 bg-white border rounded"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Stock Packs"
-                        value={v.stock}
-                        onChange={(e) => {
-                          const updated = [...pVariants];
-                          updated[i].stock = Number(e.target.value);
-                          setPVariants(updated);
-                        }}
-                        className="p-2 bg-white border rounded"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsProductModalOpen(false)}
-                  className="px-4 py-2 border rounded-xl text-stone-600 hover:bg-stone-100"
+                  className="p-1.5 text-stone-400 hover:text-stone-700 rounded-lg hover:bg-stone-100"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-brand-magenta hover:bg-brand-magenta-dark text-white font-bold rounded-xl shadow-xs"
-                >
-                  Save Product
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+
+              {/* Navigation Tabs */}
+              <div className="flex flex-wrap gap-1.5 border-b pb-2 text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setProductModalTab('details')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    productModalTab === 'details'
+                      ? 'bg-brand-navy text-white shadow-xs'
+                      : 'text-stone-600 hover:bg-stone-100'
+                  }`}
+                >
+                  1. Details & Visibility
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductModalTab('images')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    productModalTab === 'images'
+                      ? 'bg-brand-navy text-white shadow-xs'
+                      : 'text-stone-600 hover:bg-stone-100'
+                  }`}
+                >
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>2. Photos ({pImagesList.filter(Boolean).length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductModalTab('variants')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    productModalTab === 'variants'
+                      ? 'bg-brand-navy text-white shadow-xs'
+                      : 'text-stone-600 hover:bg-stone-100'
+                  }`}
+                >
+                  <IndianRupee className="w-3.5 h-3.5" />
+                  <span>3. Pricing & Variants ({pVariants.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductModalTab('specs')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                    productModalTab === 'specs'
+                      ? 'bg-brand-navy text-white shadow-xs'
+                      : 'text-stone-600 hover:bg-stone-100'
+                  }`}
+                >
+                  4. Specs & Storage
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProductModalTab('preview')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    productModalTab === 'preview'
+                      ? 'bg-brand-magenta text-white shadow-xs'
+                      : 'text-brand-magenta hover:bg-brand-magenta/10'
+                  }`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>5. Live Preview</span>
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
+                
+                {/* TAB 1: DETAILS & VISIBILITY */}
+                {productModalTab === 'details' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Delicacy Name (English) *</label>
+                        <input
+                          type="text"
+                          required
+                          value={pName}
+                          onChange={(e) => setPName(e.target.value)}
+                          placeholder="e.g. Saffron Angoori Petha"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Hindi Name</label>
+                        <input
+                          type="text"
+                          value={pHindiName}
+                          onChange={(e) => setPHindiName(e.target.value)}
+                          placeholder="e.g. केसर अंगूरी पेठा"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">URL Slug *</label>
+                        <input
+                          type="text"
+                          value={pSlug}
+                          onChange={(e) => setPSlug(e.target.value)}
+                          placeholder="auto-generated-from-name"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg font-mono text-[11px] focus:outline-none focus:border-brand-magenta"
+                        />
+                        <span className="text-[10px] text-stone-400 block mt-0.5">
+                          URL: /product/{previewCleanSlug || 'delicacy-name'}
+                        </span>
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Category *</label>
+                        <select
+                          value={pCategory}
+                          onChange={(e) => setPCategory(e.target.value as any)}
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        >
+                          <option value="petha">Agra Petha</option>
+                          <option value="namkeen">Agra Namkeen</option>
+                          <option value="gift-boxes">Royal Gift Boxes</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Sub-category</label>
+                        <input
+                          type="text"
+                          value={pSubCategory}
+                          onChange={(e) => setPSubCategory(e.target.value)}
+                          placeholder="e.g. Dry Petha, Dalmoth, Hampers"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold mb-1 text-stone-700">Short Summary *</label>
+                      <input
+                        type="text"
+                        required
+                        value={pShortDesc}
+                        onChange={(e) => setPShortDesc(e.target.value)}
+                        placeholder="Single sentence summary for cards and search results"
+                        className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold mb-1 text-stone-700">Detailed Story & Description *</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={pDesc}
+                        onChange={(e) => setPDesc(e.target.value)}
+                        placeholder="Complete artisan description, heritage backstory, and tasting notes..."
+                        className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold mb-1 text-stone-700">Tags (comma separated)</label>
+                      <input
+                        type="text"
+                        value={pTags}
+                        onChange={(e) => setPTags(e.target.value)}
+                        placeholder="e.g. saffron, agra-special, festive, gift, best-seller"
+                        className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                      />
+                    </div>
+
+                    {/* Visibility & Status Checkboxes */}
+                    <div className="p-3 bg-stone-50 rounded-xl border border-stone-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer font-semibold text-stone-800">
+                        <input
+                          type="checkbox"
+                          checked={pIsPublished}
+                          onChange={(e) => setPIsPublished(e.target.checked)}
+                          className="accent-brand-magenta w-4 h-4"
+                        />
+                        <span>Live on Storefront (Published)</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer font-semibold text-stone-800">
+                        <input
+                          type="checkbox"
+                          checked={pIsAvailable}
+                          onChange={(e) => setPIsAvailable(e.target.checked)}
+                          className="accent-brand-magenta w-4 h-4"
+                        />
+                        <span>In Stock & Orderable</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer font-semibold text-stone-800">
+                        <input
+                          type="checkbox"
+                          checked={pIsBestseller}
+                          onChange={(e) => setPIsBestseller(e.target.checked)}
+                          className="accent-brand-magenta w-4 h-4"
+                        />
+                        <span>Crown as Royal Bestseller</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: IMAGES & STORAGE */}
+                {productModalTab === 'images' && (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-brand-cream/60 rounded-xl border border-brand-gold/30 flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-brand-gold-dark mt-0.5 shrink-0" />
+                      <div className="text-[11px] text-stone-700 space-y-0.5">
+                        <p className="font-semibold text-brand-navy">Supabase Storage Bucket: <code className="bg-white px-1 py-0.5 rounded text-brand-magenta">photos</code></p>
+                        <p>Upload high-resolution images. The first image automatically serves as the primary photo across cards and galleries.</p>
+                      </div>
+                    </div>
+                    <ProductImageManager
+                      productId={editingProduct?.id}
+                      images={pImagesList}
+                      onChange={setPImagesList}
+                    />
+                  </div>
+                )}
+
+                {/* TAB 3: VARIANTS & PRICING */}
+                {productModalTab === 'variants' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-stone-800">Available Weight Packages</span>
+                      <button
+                        type="button"
+                        onClick={handleAddVariant}
+                        className="px-3 py-1.5 bg-brand-navy hover:bg-brand-navy-light text-white rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Weight Variant</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      {pVariants.map((v, i) => (
+                        <div key={v.id || i} className="p-3 bg-stone-50 rounded-xl border border-stone-200 grid grid-cols-1 sm:grid-cols-6 gap-2 items-center">
+                          <div className="sm:col-span-1">
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Weight (label)</label>
+                            <input
+                              type="text"
+                              placeholder="500g"
+                              value={v.weight}
+                              onChange={(e) => {
+                                const updated = [...pVariants];
+                                updated[i].weight = e.target.value;
+                                setPVariants(updated);
+                              }}
+                              className="w-full p-2 bg-white border rounded text-xs font-semibold"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-1">
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Price (₹) *</label>
+                            <input
+                              type="number"
+                              placeholder="220"
+                              value={v.price}
+                              onChange={(e) => {
+                                const updated = [...pVariants];
+                                updated[i].price = Number(e.target.value);
+                                setPVariants(updated);
+                              }}
+                              className="w-full p-2 bg-white border rounded text-xs font-bold text-brand-magenta"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-1">
+                            <label className="text-[10px] text-stone-500 block mb-0.5">MRP (₹)</label>
+                            <input
+                              type="number"
+                              placeholder="260"
+                              value={v.mrp || ''}
+                              onChange={(e) => {
+                                const updated = [...pVariants];
+                                updated[i].mrp = Number(e.target.value);
+                                setPVariants(updated);
+                              }}
+                              className="w-full p-2 bg-white border rounded text-xs"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-1">
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Stock (packs)</label>
+                            <input
+                              type="number"
+                              placeholder="50"
+                              value={v.stock}
+                              onChange={(e) => {
+                                const updated = [...pVariants];
+                                updated[i].stock = Number(e.target.value);
+                                setPVariants(updated);
+                              }}
+                              className="w-full p-2 bg-white border rounded text-xs"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-1 flex items-center justify-center pt-3 sm:pt-0">
+                            <label className="flex items-center gap-1.5 cursor-pointer text-[11px] font-medium text-stone-700">
+                              <input
+                                type="radio"
+                                name="defaultVariant"
+                                checked={Boolean(v.isDefault)}
+                                onChange={() => handleSetDefaultVariant(i)}
+                                className="accent-brand-magenta"
+                              />
+                              <span>Default</span>
+                            </label>
+                          </div>
+
+                          <div className="sm:col-span-1 flex justify-end pt-2 sm:pt-0">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveVariant(i)}
+                              className="p-1.5 text-stone-400 hover:text-red-600 rounded-lg hover:bg-stone-100 cursor-pointer"
+                              title="Delete Variant"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: SPECIFICATIONS & STORAGE */}
+                {productModalTab === 'specs' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block font-semibold mb-1 text-stone-700">Pure Ingredients (comma separated) *</label>
+                      <input
+                        type="text"
+                        value={pIngredients}
+                        onChange={(e) => setPIngredients(e.target.value)}
+                        placeholder="Winter Melon, Sugar, Saffron, Cardamom"
+                        className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Shelf Life</label>
+                        <input
+                          type="text"
+                          value={pShelfLife}
+                          onChange={(e) => setPShelfLife(e.target.value)}
+                          placeholder="e.g. 15 Days"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Storage Guidelines</label>
+                        <input
+                          type="text"
+                          value={pStorage}
+                          onChange={(e) => setPStorage(e.target.value)}
+                          placeholder="Store in refrigeration once opened"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block font-semibold mb-1 text-stone-700">Allergen Notice</label>
+                        <input
+                          type="text"
+                          value={pAllergenInfo}
+                          onChange={(e) => setPAllergenInfo(e.target.value)}
+                          placeholder="e.g. Made in a facility handling tree nuts"
+                          className="w-full p-2.5 bg-stone-50 border rounded-lg focus:outline-none focus:border-brand-magenta"
+                        />
+                      </div>
+                      <div>
+                        <span className="block font-semibold mb-1 text-stone-700">Nutritional Facts (Per 100g)</span>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <div>
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Calories</label>
+                            <input
+                              type="text"
+                              value={pCalories}
+                              onChange={(e) => setPCalories(e.target.value)}
+                              placeholder="310 kcal"
+                              className="w-full p-2 bg-stone-50 border rounded text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Carbohydrates</label>
+                            <input
+                              type="text"
+                              value={pCarbs}
+                              onChange={(e) => setPCarbs(e.target.value)}
+                              placeholder="76g"
+                              className="w-full p-2 bg-stone-50 border rounded text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Protein</label>
+                            <input
+                              type="text"
+                              value={pProtein}
+                              onChange={(e) => setPProtein(e.target.value)}
+                              placeholder="0.8g"
+                              className="w-full p-2 bg-stone-50 border rounded text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-stone-500 block mb-0.5">Fat</label>
+                            <input
+                              type="text"
+                              value={pFat}
+                              onChange={(e) => setPFat(e.target.value)}
+                              placeholder="0g"
+                              className="w-full p-2 bg-stone-50 border rounded text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 5: LIVE STOREFRONT PREVIEW */}
+                {productModalTab === 'preview' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-brand-cream/60 rounded-xl border border-brand-gold/30 text-xs">
+                      <p className="font-bold text-brand-navy flex items-center gap-1.5">
+                        <Eye className="w-4 h-4 text-brand-magenta" />
+                        <span>Interactive Customer Storefront Preview</span>
+                      </p>
+                      <p className="text-stone-600 text-[11px] mt-0.5">
+                        This preview simulates exactly how this Agra delicacy will appear to buyers on product listing grids, category shelves, and recommendations.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                      {/* Live Product Card */}
+                      <div className="max-w-xs mx-auto w-full">
+                        <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider block mb-2 text-center">
+                          Product Card Preview
+                        </span>
+                        <ProductCard product={previewProduct} />
+                      </div>
+
+                      {/* Live Metadata Summary */}
+                      <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200 space-y-2.5 text-xs">
+                        <span className="font-bold text-brand-navy block pb-1 border-b">Summary Checklist</span>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Storefront Status:</span>
+                          <span className={`font-bold ${pIsPublished ? 'text-emerald-700' : 'text-amber-700'}`}>
+                            {pIsPublished ? 'Published (Visible to all patrons)' : 'Draft (Admin eyes only)'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Stock Availability:</span>
+                          <span className={`font-bold ${pIsAvailable ? 'text-emerald-700' : 'text-red-700'}`}>
+                            {pIsAvailable ? 'In Stock' : 'Marked Unavailable'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Photos Count:</span>
+                          <span className="font-mono font-bold text-stone-800">{pImagesList.filter(Boolean).length} uploaded</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Weight Variants:</span>
+                          <span className="font-bold text-stone-800">{pVariants.length} option(s)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">Price Range:</span>
+                          <span className="font-bold text-brand-magenta">
+                            ₹{Math.min(...pVariants.map(v => v.price))} - ₹{Math.max(...pVariants.map(v => v.price))}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-500">SEO Slug:</span>
+                          <span className="font-mono text-stone-700">/{previewCleanSlug}</span>
+                        </div>
+                        {Boolean(previewProduct.tags && previewProduct.tags.length > 0) && (
+                          <div className="pt-2">
+                            <span className="text-stone-500 block mb-1">Tags:</span>
+                            <div className="flex flex-wrap gap-1">
+                              {previewProduct.tags?.map((t, i) => (
+                                <span key={i} className="px-2 py-0.5 rounded bg-white border border-stone-200 text-[10px] text-stone-600">
+                                  #{t}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Modal Footer Controls */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-4 border-t">
+                  <div className="flex items-center gap-2">
+                    <span className="text-stone-500 text-[11px]">Status:</span>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                      pIsPublished ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}>
+                      {pIsPublished ? 'Will be Live' : 'Will be Draft'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsProductModalOpen(false)}
+                      className="px-4 py-2 border rounded-xl text-stone-600 hover:bg-stone-100 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSavingProduct}
+                      onClick={(e) => {
+                        setPIsPublished(false);
+                        setTimeout(() => {
+                          const form = (e.target as HTMLElement).closest('form');
+                          if (form) form.requestSubmit();
+                        }, 50);
+                      }}
+                      className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 font-semibold rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      Save as Draft 🟡
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingProduct}
+                      onClick={() => setPIsPublished(true)}
+                      className="px-6 py-2 bg-brand-magenta hover:bg-brand-magenta-dark text-white font-bold rounded-xl shadow-royal transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {isSavingProduct ? (
+                        <span>Saving to Supabase...</span>
+                      ) : (
+                        <span>Save & Publish 🟢</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Order Status Modal */}
       {selectedOrder && (

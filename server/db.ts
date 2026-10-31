@@ -98,11 +98,16 @@ function formatProduct(row: any, variants: any[] = []): Product {
     isVegetarian: Boolean(row.is_vegetarian),
     isBestseller: Boolean(row.is_bestseller),
     isFeatured: Boolean(row.is_featured),
+    isPublished: row.is_published !== undefined ? Boolean(row.is_published) : true,
+    isAvailable: row.is_available !== undefined ? Boolean(row.is_available) : true,
+    tags: Array.isArray(row.tags) ? row.tags : [],
     rating: Number(row.rating || 4.9),
     reviewCount: Number(row.review_count || 0),
     images: Array.isArray(row.images) ? row.images : [],
     variants: mappedVariants,
-    nutritionalInfo: row.nutritional_info || undefined
+    nutritionalInfo: row.nutritional_info || undefined,
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || new Date().toISOString()
   };
 }
 
@@ -348,6 +353,9 @@ export const db = {
             is_vegetarian: product.isVegetarian,
             is_bestseller: product.isBestseller,
             is_featured: product.isFeatured,
+            is_published: product.isPublished !== undefined ? product.isPublished : true,
+            is_available: product.isAvailable !== undefined ? product.isAvailable : true,
+            tags: product.tags || [],
             rating: product.rating,
             review_count: product.reviewCount,
             images: product.images,
@@ -404,6 +412,9 @@ export const db = {
             is_vegetarian: product.isVegetarian,
             is_bestseller: product.isBestseller,
             is_featured: product.isFeatured,
+            is_published: product.isPublished !== undefined ? product.isPublished : true,
+            is_available: product.isAvailable !== undefined ? product.isAvailable : true,
+            tags: product.tags || [],
             images: product.images,
             updated_at: new Date().toISOString()
           })
